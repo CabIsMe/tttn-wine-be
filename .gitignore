@@ -1,0 +1,7 @@
+fc_optimal_assignment*
+.env
+tmp*
+.air*
+*.txt
+.vscode
+.idea
