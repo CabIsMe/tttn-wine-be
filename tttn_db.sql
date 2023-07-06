@@ -25,10 +25,10 @@ DROP TABLE IF EXISTS `account`;
 CREATE TABLE `account` (
   `username` varchar(100) NOT NULL,
   `password` varchar(500) NOT NULL,
-  `role_id` varchar(25) NOT NULL,
+  `role_id` char(25) NOT NULL,
   PRIMARY KEY (`username`),
-  KEY `role_id_idx` (`role_id`),
-  CONSTRAINT `fk_account_role_id` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`)
+  KEY `fk_account_role_id_idx` (`role_id`),
+  CONSTRAINT `fk_account_role_id` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -50,13 +50,16 @@ DROP TABLE IF EXISTS `bill`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill` (
   `bill_id` varchar(25) NOT NULL,
-  `customer_order_id` varchar(25) NOT NULL,
-  `create_at` datetime DEFAULT NULL,
-  `total` float DEFAULT NULL,
-  `tax` float DEFAULT NULL,
+  `t_create` datetime DEFAULT NULL,
+  `tax_id` varchar(45) DEFAULT NULL,
+  `tax_name` varchar(45) DEFAULT NULL,
+  `customer_order_id` char(25) NOT NULL,
+  `employee_id` char(25) NOT NULL,
   PRIMARY KEY (`bill_id`),
   KEY `fk_bill_customer_order_id_idx` (`customer_order_id`),
-  CONSTRAINT `fk_bill_customer_order_id` FOREIGN KEY (`customer_order_id`) REFERENCES `customer_order` (`customer_order_id`)
+  KEY `fk_bill_employee_id_idx` (`employee_id`),
+  CONSTRAINT `fk_bill_customer_order_id` FOREIGN KEY (`customer_order_id`) REFERENCES `customer_order` (`customer_order_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_bill_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -77,7 +80,7 @@ DROP TABLE IF EXISTS `brand`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `brand` (
-  `brand_id` varchar(25) NOT NULL,
+  `brand_id` char(25) NOT NULL,
   `brand_name` varchar(100) NOT NULL,
   `brand_img` varchar(500) DEFAULT NULL,
   `brand_desc` varchar(100) DEFAULT NULL,
@@ -102,7 +105,7 @@ DROP TABLE IF EXISTS `category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `category` (
-  `category_id` varchar(25) NOT NULL,
+  `category_id` char(25) NOT NULL,
   `category_name` varchar(100) NOT NULL,
   PRIMARY KEY (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -125,8 +128,8 @@ DROP TABLE IF EXISTS `customer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customer` (
-  `customer_id` varchar(25) NOT NULL,
-  `customer_name` varchar(100) NOT NULL,
+  `customer_id` char(25) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
   `gender` tinyint(1) DEFAULT NULL,
   `date_of_birth` date DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
@@ -134,7 +137,7 @@ CREATE TABLE `customer` (
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`customer_id`),
   KEY `fk_customer_account_idx` (`email`),
-  CONSTRAINT `fk_customer_account` FOREIGN KEY (`email`) REFERENCES `account` (`username`)
+  CONSTRAINT `fk_customer_account` FOREIGN KEY (`email`) REFERENCES `account` (`username`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -155,20 +158,23 @@ DROP TABLE IF EXISTS `customer_order`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customer_order` (
-  `customer_order_id` varchar(25) NOT NULL,
-  `product_id` varchar(25) NOT NULL,
-  `amount` int DEFAULT NULL,
-  `customer_id` varchar(25) NOT NULL,
-  `employee_id` varchar(25) NOT NULL,
-  `customer_order_date` datetime DEFAULT NULL,
+  `customer_order_id` char(25) NOT NULL,
+  `t_create` datetime DEFAULT NULL,
+  `fullname` varchar(100) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `phone_number` varchar(1) DEFAULT NULL,
+  `t_delivery` datetime DEFAULT NULL,
   `status` tinyint DEFAULT NULL,
+  `employee_id` char(25) NOT NULL,
+  `deliverer_id` char(25) NOT NULL,
+  `customer_id` char(25) NOT NULL,
   PRIMARY KEY (`customer_order_id`),
-  KEY `fk_customer_order_customer_id_idx` (`customer_id`),
-  KEY `fk_customer_order_product_id_idx` (`product_id`),
+  KEY `customer_order_customer_id_idx` (`customer_id`),
   KEY `fk_customer_order_employee_id_idx` (`employee_id`),
-  CONSTRAINT `fk_customer_order_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
-  CONSTRAINT `fk_customer_order_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`),
-  CONSTRAINT `fk_customer_order_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
+  KEY `fk_customer_order_deliverer_id_idx` (`deliverer_id`),
+  CONSTRAINT `fk_customer_order_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_customer_order_deliverer_id` FOREIGN KEY (`deliverer_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_customer_order_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -182,6 +188,36 @@ LOCK TABLES `customer_order` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `customer_order_detail`
+--
+
+DROP TABLE IF EXISTS `customer_order_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `customer_order_detail` (
+  `customer_order_detail_id` char(25) NOT NULL,
+  `product_id` char(25) NOT NULL,
+  `customer_order_id` char(25) NOT NULL,
+  `amount` int DEFAULT NULL,
+  `cost` float DEFAULT NULL,
+  PRIMARY KEY (`customer_order_detail_id`),
+  KEY `fk_customer_order_detail_product_id_idx` (`product_id`),
+  KEY `fk_customer_order_detail_customer_order_id_idx` (`customer_order_id`),
+  CONSTRAINT `fk_customer_order_detail_customer_order_id` FOREIGN KEY (`customer_order_id`) REFERENCES `customer_order` (`customer_order_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_customer_order_detail_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `customer_order_detail`
+--
+
+LOCK TABLES `customer_order_detail` WRITE;
+/*!40000 ALTER TABLE `customer_order_detail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `customer_order_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `employee`
 --
 
@@ -189,8 +225,8 @@ DROP TABLE IF EXISTS `employee`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `employee` (
-  `employee_id` varchar(25) NOT NULL,
-  `employee_name` varchar(100) NOT NULL,
+  `employee_id` char(25) NOT NULL,
+  `full_name` varchar(100) DEFAULT NULL,
   `gender` tinyint(1) DEFAULT NULL,
   `date_of_birth` date DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
@@ -198,7 +234,7 @@ CREATE TABLE `employee` (
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`employee_id`),
   KEY `email_idx` (`email`),
-  CONSTRAINT `fk_employee_account` FOREIGN KEY (`email`) REFERENCES `account` (`username`)
+  CONSTRAINT `fk_employee_account` FOREIGN KEY (`email`) REFERENCES `account` (`username`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -219,20 +255,15 @@ DROP TABLE IF EXISTS `order`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order` (
-  `order_id` varchar(25) NOT NULL,
-  `create_at` date DEFAULT NULL,
-  `product_id` varchar(25) NOT NULL,
-  `order_cost` float DEFAULT NULL,
-  `amount` int DEFAULT NULL,
-  `provider_id` varchar(25) NOT NULL,
-  `employee_id` varchar(25) NOT NULL,
+  `order_id` char(25) NOT NULL,
+  `t_create` datetime DEFAULT NULL,
+  `provider_id` char(25) NOT NULL,
+  `employee_id` char(25) NOT NULL,
   PRIMARY KEY (`order_id`),
-  KEY `employee_id_idx` (`employee_id`),
-  KEY `provider_id_idx` (`provider_id`),
-  KEY `product_id_idx` (`product_id`),
-  CONSTRAINT `fk_order_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`),
-  CONSTRAINT `fk_order_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
-  CONSTRAINT `fk_order_provider_id` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`)
+  KEY `fk_order_provider_id_idx` (`provider_id`),
+  KEY `fk_order_employee_id_idx` (`employee_id`),
+  CONSTRAINT `fk_order_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_provider_id` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -246,6 +277,32 @@ LOCK TABLES `order` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `order_detail`
+--
+
+DROP TABLE IF EXISTS `order_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_detail` (
+  `order_id` char(25) NOT NULL,
+  `product_id` char(25) NOT NULL,
+  `amount` int DEFAULT NULL,
+  `cost` float DEFAULT NULL,
+  PRIMARY KEY (`order_id`,`product_id`),
+  CONSTRAINT `fk_order_product_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`order_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_detail`
+--
+
+LOCK TABLES `order_detail` WRITE;
+/*!40000 ALTER TABLE `order_detail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `order_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `product`
 --
 
@@ -253,23 +310,20 @@ DROP TABLE IF EXISTS `product`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `product` (
-  `product_id` varchar(25) NOT NULL,
+  `product_id` char(25) NOT NULL,
   `product_name` varchar(100) NOT NULL,
   `cost` float DEFAULT NULL,
   `product_img` varchar(500) DEFAULT NULL,
   `description` varchar(100) DEFAULT NULL,
   `inventory_number` int DEFAULT NULL,
-  `product_status` varchar(45) DEFAULT NULL,
-  `brand_id` varchar(25) DEFAULT NULL,
-  `category_id` varchar(25) DEFAULT NULL,
-  `provider_id` varchar(25) DEFAULT NULL,
+  `status` varchar(45) DEFAULT NULL,
+  `brand_id` char(25) NOT NULL,
+  `category_id` char(25) NOT NULL,
   PRIMARY KEY (`product_id`),
   KEY `category_id_idx` (`category_id`),
   KEY `brand_id_idx` (`brand_id`),
-  KEY `provider_id_idx` (`provider_id`),
-  CONSTRAINT `fk_product_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`brand_id`),
-  CONSTRAINT `fk_product_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`),
-  CONSTRAINT `fk_product_provider_id` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`)
+  CONSTRAINT `fk_product_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`brand_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -290,17 +344,15 @@ DROP TABLE IF EXISTS `promotion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `promotion` (
-  `promotion_name` varchar(100) NOT NULL,
+  `promotion_id` char(25) NOT NULL,
+  `promotion_name` varchar(100) DEFAULT NULL,
   `date_start` date DEFAULT NULL,
   `date_end` date DEFAULT NULL,
-  `promotion_desc` varchar(100) DEFAULT NULL,
-  `product_id` varchar(25) DEFAULT NULL,
-  `employee_id` varchar(25) DEFAULT NULL,
-  PRIMARY KEY (`promotion_name`),
-  KEY `product_id_idx` (`product_id`),
+  `description` varchar(100) DEFAULT NULL,
+  `employee_id` char(25) NOT NULL,
+  PRIMARY KEY (`promotion_id`),
   KEY `employee_id_idx` (`employee_id`),
-  CONSTRAINT `fk_promotion_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`),
-  CONSTRAINT `fk_promotion_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
+  CONSTRAINT `fk_promotion_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -314,6 +366,59 @@ LOCK TABLES `promotion` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `promotion_detail`
+--
+
+DROP TABLE IF EXISTS `promotion_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `promotion_detail` (
+  `product_id` char(25) NOT NULL,
+  `promotion_id` char(25) NOT NULL,
+  `discount_percentage` float DEFAULT NULL,
+  PRIMARY KEY (`product_id`,`promotion_id`),
+  KEY `fk_product_promotion_id_idx` (`promotion_id`),
+  CONSTRAINT `fk_product_promotion_id` FOREIGN KEY (`promotion_id`) REFERENCES `promotion` (`promotion_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_promotion_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `promotion_detail`
+--
+
+LOCK TABLES `promotion_detail` WRITE;
+/*!40000 ALTER TABLE `promotion_detail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `promotion_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `provide_product`
+--
+
+DROP TABLE IF EXISTS `provide_product`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `provide_product` (
+  `provider_id` char(25) NOT NULL,
+  `product_id` char(25) NOT NULL,
+  PRIMARY KEY (`provider_id`,`product_id`),
+  KEY `fk_product_id_idx` (`product_id`),
+  CONSTRAINT `fk_product_provider_id` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`),
+  CONSTRAINT `fk_provider_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `provide_product`
+--
+
+LOCK TABLES `provide_product` WRITE;
+/*!40000 ALTER TABLE `provide_product` DISABLE KEYS */;
+/*!40000 ALTER TABLE `provide_product` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `provider`
 --
 
@@ -321,7 +426,7 @@ DROP TABLE IF EXISTS `provider`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `provider` (
-  `provider_id` varchar(25) NOT NULL,
+  `provider_id` char(25) NOT NULL,
   `provider_name` varchar(100) NOT NULL,
   `address` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
@@ -346,15 +451,15 @@ DROP TABLE IF EXISTS `receipt`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `receipt` (
-  `receipt_id` varchar(25) NOT NULL,
-  `create_at` date DEFAULT NULL,
-  `employee_id` varchar(25) NOT NULL,
-  `order_id` varchar(25) NOT NULL,
+  `receipt_id` char(25) NOT NULL,
+  `t_create` datetime DEFAULT NULL,
+  `employee_id` char(25) NOT NULL,
+  `order_id` char(25) NOT NULL,
   PRIMARY KEY (`receipt_id`),
   KEY `fk_receipt_employee_id_idx` (`employee_id`),
   KEY `fk_receipt_order_id_idx` (`order_id`),
-  CONSTRAINT `fk_receipt_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`),
-  CONSTRAINT `fk_receipt_order_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`order_id`)
+  CONSTRAINT `fk_receipt_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_receipt_order_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`order_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -368,6 +473,90 @@ LOCK TABLES `receipt` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `receipt_detail`
+--
+
+DROP TABLE IF EXISTS `receipt_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `receipt_detail` (
+  `receipt_id` char(25) NOT NULL,
+  `product_id` char(25) NOT NULL,
+  `amount` int DEFAULT NULL,
+  `cost` float DEFAULT NULL,
+  PRIMARY KEY (`receipt_id`,`product_id`),
+  KEY `fk_receipt_product_id_idx` (`product_id`),
+  CONSTRAINT `fk_product_receipt_id` FOREIGN KEY (`receipt_id`) REFERENCES `receipt` (`receipt_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_receipt_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `receipt_detail`
+--
+
+LOCK TABLES `receipt_detail` WRITE;
+/*!40000 ALTER TABLE `receipt_detail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `receipt_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `return_order`
+--
+
+DROP TABLE IF EXISTS `return_order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `return_order` (
+  `return_order_id` char(25) NOT NULL,
+  `t_create` datetime DEFAULT NULL,
+  `customer_order_id` char(25) NOT NULL,
+  `employee_id` char(25) NOT NULL,
+  PRIMARY KEY (`return_order_id`),
+  KEY `fk_return_order_customer_order_id_idx` (`customer_order_id`),
+  KEY `fk_return_order_employee_id_idx` (`employee_id`),
+  CONSTRAINT `fk_return_order_customer_order_id` FOREIGN KEY (`customer_order_id`) REFERENCES `customer_order` (`customer_order_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_return_order_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `return_order`
+--
+
+LOCK TABLES `return_order` WRITE;
+/*!40000 ALTER TABLE `return_order` DISABLE KEYS */;
+/*!40000 ALTER TABLE `return_order` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `return_order_detail`
+--
+
+DROP TABLE IF EXISTS `return_order_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `return_order_detail` (
+  `return_order_id` char(25) NOT NULL,
+  `customer_order_detail_id` char(25) NOT NULL,
+  `amount` int DEFAULT NULL,
+  PRIMARY KEY (`return_order_id`,`customer_order_detail_id`),
+  KEY `fk_return_order_detail_customer_order_detail_id_idx` (`customer_order_detail_id`),
+  CONSTRAINT `fk_return_order_detail_customer_order_detail_id` FOREIGN KEY (`customer_order_detail_id`) REFERENCES `customer_order_detail` (`customer_order_detail_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_return_order_detail_return_order_id` FOREIGN KEY (`return_order_id`) REFERENCES `return_order` (`return_order_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `return_order_detail`
+--
+
+LOCK TABLES `return_order_detail` WRITE;
+/*!40000 ALTER TABLE `return_order_detail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `return_order_detail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `role`
 --
 
@@ -375,7 +564,7 @@ DROP TABLE IF EXISTS `role`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `role` (
-  `role_id` varchar(25) NOT NULL,
+  `role_id` char(25) NOT NULL,
   `role_name` varchar(100) NOT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -399,4 +588,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-05 22:56:24
+-- Dump completed on 2023-07-06 14:26:02
