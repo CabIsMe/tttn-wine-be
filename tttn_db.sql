@@ -16,29 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `account`
+-- Table structure for table `accounts`
 --
 
-DROP TABLE IF EXISTS `account`;
+DROP TABLE IF EXISTS `accounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `account` (
+CREATE TABLE `accounts` (
   `username` varchar(100) NOT NULL,
   `password` varchar(500) NOT NULL,
-  `role_id` char(25) NOT NULL,
+  `role_id` tinyint unsigned NOT NULL,
   PRIMARY KEY (`username`),
   KEY `fk_account_role_id_idx` (`role_id`),
-  CONSTRAINT `fk_account_role_id` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`) ON UPDATE CASCADE
+  CONSTRAINT `fk_account_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `account`
+-- Dumping data for table `accounts`
 --
 
-LOCK TABLES `account` WRITE;
-/*!40000 ALTER TABLE `account` DISABLE KEYS */;
-/*!40000 ALTER TABLE `account` ENABLE KEYS */;
+LOCK TABLES `accounts` WRITE;
+/*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES ('davidjohnson@example.com','123',2),('hoangvane@example.com','123',1),('janesmith@example.com','123',2),('johndoe@example.com','123',2),('phamthid@example.com','123',1);
+/*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -137,7 +138,7 @@ CREATE TABLE `customer` (
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`customer_id`),
   KEY `fk_customer_account_idx` (`email`),
-  CONSTRAINT `fk_customer_account` FOREIGN KEY (`email`) REFERENCES `account` (`username`) ON UPDATE CASCADE
+  CONSTRAINT `fk_customer_account` FOREIGN KEY (`email`) REFERENCES `accounts` (`username`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -147,6 +148,7 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
+INSERT INTO `customer` VALUES ('gj6xxjLVV8aA3SvrGJZCQ','Lê Quang C',1,'1995-07-10','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0923456789','davidjohnson@example.com'),('hJ5Ly8WYdIrb34MJNnauQ','Nguyễn Văn A',1,'1990-01-15','Số 10, Đường ABC, Quận XYZ, Thành phố HCM','0901234567','johndoe@example.com'),('ks6DKgmOmYH5OGbWPeHg4','Trần Thị B',0,'1985-05-20','Số 20, Đường XYZ, Quận ABC, Thành phố Hà Nội','0912345678','janesmith@example.com');
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -234,7 +236,7 @@ CREATE TABLE `employee` (
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`employee_id`),
   KEY `email_idx` (`email`),
-  CONSTRAINT `fk_employee_account` FOREIGN KEY (`email`) REFERENCES `account` (`username`) ON UPDATE CASCADE
+  CONSTRAINT `fk_employee_account` FOREIGN KEY (`email`) REFERENCES `accounts` (`username`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -244,6 +246,7 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
+INSERT INTO `employee` VALUES ('VsFSmP8AcrU1c84V0gCVk','Phạm Thị D',0,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','phamthid@example.com'),('zZRwcVgDSPhO0EEn2RVyh','Hoàng Văn E',1,'1988-09-25','Số 30, Đường STU, Quận VWX, Thành phố Hải Phòng','0945678901','hoangvane@example.com');
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -557,26 +560,27 @@ LOCK TABLES `return_order_detail` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `role`
+-- Table structure for table `roles`
 --
 
-DROP TABLE IF EXISTS `role`;
+DROP TABLE IF EXISTS `roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `role` (
-  `role_id` char(25) NOT NULL,
+CREATE TABLE `roles` (
+  `role_id` tinyint unsigned NOT NULL,
   `role_name` varchar(100) NOT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `role`
+-- Dumping data for table `roles`
 --
 
-LOCK TABLES `role` WRITE;
-/*!40000 ALTER TABLE `role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `role` ENABLE KEYS */;
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,'admin'),(2,'client');
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -588,4 +592,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-06 14:26:02
+-- Dump completed on 2023-07-06 22:46:18
