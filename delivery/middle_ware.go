@@ -1,11 +1,11 @@
 package delivery
 
 import (
-	"fc_optimal_assignment/internal"
-	"fc_optimal_assignment/internal/models"
-	"fc_optimal_assignment/internal/utils"
 	"net/http"
 
+	"github.com/CabIsMe/tttn-wine-be/internal"
+	"github.com/CabIsMe/tttn-wine-be/internal/models"
+	"github.com/CabIsMe/tttn-wine-be/internal/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/golang-module/carbon/v2"

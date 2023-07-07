@@ -1,4 +1,4 @@
-module fc_optimal_assignment
+module github.com/CabIsMe/tttn-wine-be
 
 go 1.19
 

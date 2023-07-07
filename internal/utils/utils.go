@@ -1,12 +1,12 @@
 package utils
 
 import (
-	"fc_optimal_assignment/internal"
 	"fmt"
 	"math"
 	"strings"
 	"time"
 
+	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/golang-module/carbon/v2"
 )
 
@@ -24,16 +24,6 @@ func GenTaskId() string {
 	return prefix + now
 }
 
-// Làm tròn
-func RoundMeter2Km(m float64) float64 {
-	km := m / 1000.0
-	roundKm := math.Ceil(km*10) / 10
-	return roundKm
-}
-func Round2Km(km float64) float64 {
-	roundKm := math.Ceil(km*10) / 10
-	return roundKm
-}
 func IsSubSlice(parent []string, subSlice []string) bool {
 
 	for _, c := range subSlice {

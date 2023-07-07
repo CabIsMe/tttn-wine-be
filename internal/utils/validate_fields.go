@@ -1,8 +1,7 @@
 package utils
 
 import (
-	"fc_optimal_assignment/internal/models"
-
+	"github.com/CabIsMe/tttn-wine-be/internal/models"
 	"github.com/go-playground/validator/v10"
 )
 
