@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: tttn
+-- Host: 127.0.0.1    Database: tttn1
 -- ------------------------------------------------------
 -- Server version	8.0.33
 
@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `accounts`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `accounts` (
   `username` varchar(100) NOT NULL,
-  `password` varchar(500) NOT NULL,
+  `user_password` varchar(500) NOT NULL,
   `role_id` tinyint unsigned NOT NULL,
   PRIMARY KEY (`username`),
   KEY `fk_account_role_id_idx` (`role_id`),
@@ -84,7 +84,7 @@ CREATE TABLE `brand` (
   `brand_id` char(25) NOT NULL,
   `brand_name` varchar(100) NOT NULL,
   `brand_img` varchar(500) DEFAULT NULL,
-  `brand_desc` varchar(100) DEFAULT NULL,
+  `brand_desc` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`brand_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -95,6 +95,7 @@ CREATE TABLE `brand` (
 
 LOCK TABLES `brand` WRITE;
 /*!40000 ALTER TABLE `brand` DISABLE KEYS */;
+INSERT INTO `brand` VALUES ('BR044023','Carlo Rossi','https://wineshop.vn/public/uploaded/product_brand/product_brand_13.jpg','A smooth and full-bodied red wine with aromas of ripe cherries, vanilla, and a touch of oak. Enjoy it with grilled meats or hearty pasta dishes.'),('BR210079','Yellow Tail','https://wineshop.vn/public/uploaded/product_brand/product_brand_15.png','A medium-bodied and well-balanced red wine with red fruit flavors, gentle tannins, and a touch of earthiness. Enjoy it with roasted poultry or grilled vegetables.'),('BR530964','Woodbridge Mondavi','https://wineshop.vn/public/uploaded/product_brand/san-mazano.jpg','A complex and aromatic white wine with tropical fruit flavors, hints of honey, and a refreshing acidity. Pair it with spicy Asian cuisine or creamy cheeses.'),('BR556729','Peter Vella','https://wineshop.vn/public/uploaded/product_brand/product_brand_16.png','A crisp and lively sparkling wine with delicate bubbles and vibrant notes of green apples and citrus. Celebrate any occasion with a glass of this sparkling delight.'),('BR689371','Barefoot Cellars','https://wineshop.vn/public/uploaded/product_brand/home-korta.jpg','An elegant and crisp white wine with refreshing citrus flavors and a touch of floral aroma. Ideal for pairing with seafood or salads.'),('BR729998','Franzia','https://wineshop.vn/public/uploaded/product_brand/francis-ford.png','A rich and velvety red wine with notes of dark berries, cocoa, and a hint of spice. Perfect for cozy evenings by the fireplace.'),('BR908082','Twin Valley','https://wineshop.vn/public/uploaded/product_brand/product_brand_9.png','A bold and robust red wine with intense blackberry and plum flavors, balanced by velvety tannins and a long, lingering finish. Perfect for steak or barbecued ribs.'),('BR964479','Sutter Home','https://wineshop.vn/public/uploaded/product_brand/product_brand_7.png','A vibrant and fruity rosé wine with flavors of fresh strawberries, watermelon, and a zesty finish. Best served chilled on warm summer days.');
 /*!40000 ALTER TABLE `brand` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,6 +119,7 @@ CREATE TABLE `category` (
 
 LOCK TABLES `category` WRITE;
 /*!40000 ALTER TABLE `category` DISABLE KEYS */;
+INSERT INTO `category` VALUES ('TW264812','Sparkling Wines'),('TW366960','Dessert Wines'),('TW667968','Red Wines'),('TW791274','Red Wines'),('TW868383','White Wines'),('TW955788','Rosé Wines');
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -317,7 +319,7 @@ CREATE TABLE `product` (
   `product_name` varchar(100) NOT NULL,
   `cost` float DEFAULT NULL,
   `product_img` varchar(500) DEFAULT NULL,
-  `description` varchar(100) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
   `inventory_number` int DEFAULT NULL,
   `status` varchar(45) DEFAULT NULL,
   `brand_id` char(25) NOT NULL,
@@ -336,6 +338,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
+INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Out of stock','BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking','BR210079','TW366960');
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -443,6 +446,7 @@ CREATE TABLE `provider` (
 
 LOCK TABLES `provider` WRITE;
 /*!40000 ALTER TABLE `provider` DISABLE KEYS */;
+INSERT INTO `provider` VALUES ('SUP001','Công ty Thực phẩm Minh Trang','Số 123, Đường Trần Phú, Quận 1, Thành phố Hồ Chí Minh','minhtrang@example.com'),('SUP002','Nhà cung cấp Hùng Vương','Số 456, Đường Hùng Vương, Quận 5, Thành phố Hải Phòng','hungvuong@example.com'),('SUP003','Cửa hàng Tấn Phát','Số 789, Đường Nguyễn Văn Linh, Quận 7, Thành phố Đà Nẵng','tanphat@example.com'),('SUP004','Nhà cung cấp Ánh Dương','Số 321, Đường Lê Lợi, Quận Bình Thạnh, Thành phố Cần Thơ','anhduong@example.com'),('SUP005','Công ty Thực phẩm Xuân Hương','Số 567, Đường Lê Duẩn, Quận 3, Thành phố Hà Nội','xuanhuong@example.com');
 /*!40000 ALTER TABLE `provider` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -592,4 +596,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-06 22:46:18
+-- Dump completed on 2023-07-07 17:51:57
