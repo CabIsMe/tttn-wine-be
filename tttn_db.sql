@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: tttn1
+-- Host: 127.0.0.1    Database: tttn
 -- ------------------------------------------------------
 -- Server version	8.0.33
 
@@ -38,7 +38,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES ('davidjohnson@example.com','123',2),('hoangvane@example.com','123',1),('janesmith@example.com','123',2),('johndoe@example.com','123',2),('phamthid@example.com','123',1);
+INSERT INTO `accounts` VALUES ('cabcab@gmail.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('davidjohnson@example.com','123',2),('hoangvane@example.com','123',1),('janesmith@example.com','123',2),('johndoe@example.com','123',2),('phamthid@example.com','123',1);
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -50,13 +50,14 @@ DROP TABLE IF EXISTS `bill`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill` (
-  `bill_id` varchar(25) NOT NULL,
+  `bill_id` char(25) NOT NULL,
   `t_create` datetime DEFAULT NULL,
   `tax_id` varchar(45) DEFAULT NULL,
   `tax_name` varchar(45) DEFAULT NULL,
   `customer_order_id` char(25) NOT NULL,
   `employee_id` char(25) NOT NULL,
   PRIMARY KEY (`bill_id`),
+  UNIQUE KEY `customer_order_id_UNIQUE` (`customer_order_id`),
   KEY `fk_bill_customer_order_id_idx` (`customer_order_id`),
   KEY `fk_bill_employee_id_idx` (`employee_id`),
   CONSTRAINT `fk_bill_customer_order_id` FOREIGN KEY (`customer_order_id`) REFERENCES `customer_order` (`customer_order_id`) ON UPDATE CASCADE,
@@ -70,6 +71,7 @@ CREATE TABLE `bill` (
 
 LOCK TABLES `bill` WRITE;
 /*!40000 ALTER TABLE `bill` DISABLE KEYS */;
+INSERT INTO `bill` VALUES ('a',NULL,NULL,NULL,'abc','VsFSmP8AcrU1c84V0gCVk');
 /*!40000 ALTER TABLE `bill` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -139,6 +141,7 @@ CREATE TABLE `customer` (
   `phone_number` varchar(11) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`customer_id`),
+  UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `fk_customer_account_idx` (`email`),
   CONSTRAINT `fk_customer_account` FOREIGN KEY (`email`) REFERENCES `accounts` (`username`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -164,7 +167,7 @@ DROP TABLE IF EXISTS `customer_order`;
 CREATE TABLE `customer_order` (
   `customer_order_id` char(25) NOT NULL,
   `t_create` datetime DEFAULT NULL,
-  `fullname` varchar(100) DEFAULT NULL,
+  `full_name` varchar(100) DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
   `phone_number` varchar(1) DEFAULT NULL,
   `t_delivery` datetime DEFAULT NULL,
@@ -188,6 +191,7 @@ CREATE TABLE `customer_order` (
 
 LOCK TABLES `customer_order` WRITE;
 /*!40000 ALTER TABLE `customer_order` DISABLE KEYS */;
+INSERT INTO `customer_order` VALUES ('abc',NULL,NULL,NULL,NULL,NULL,NULL,'VsFSmP8AcrU1c84V0gCVk','VsFSmP8AcrU1c84V0gCVk','gj6xxjLVV8aA3SvrGJZCQ');
 /*!40000 ALTER TABLE `customer_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -237,6 +241,7 @@ CREATE TABLE `employee` (
   `phone_number` varchar(11) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`employee_id`),
+  UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `email_idx` (`email`),
   CONSTRAINT `fk_employee_account` FOREIGN KEY (`email`) REFERENCES `accounts` (`username`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -596,4 +601,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-07 17:51:57
+-- Dump completed on 2023-07-09 22:56:34
