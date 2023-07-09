@@ -22,11 +22,16 @@ func ValidateStruct[T any](payload T) []*models.ErrorResponse {
 }
 func ShowErrors(errors []*models.ErrorResponse) models.ErrorDetail {
 	var stringError string
+	count := 0
 	for _, err := range errors {
-		stringError = stringError + err.Field + ", "
+		count += 1
+		stringError += "Field: " + err.Field + " [tag-error: " + err.Tag + "]"
+		if count < len(errors) {
+			stringError += ", "
+		}
 	}
 	return models.ErrorDetail{
 		TypeError:        "Error fields",
-		ErrorDescription: "Fields: " + stringError,
+		ErrorDescription: stringError,
 	}
 }

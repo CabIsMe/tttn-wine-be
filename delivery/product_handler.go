@@ -1,15 +1,37 @@
 package delivery
 
-import "github.com/CabIsMe/tttn-wine-be/internal/services"
+import (
+	"net/http"
+
+	"github.com/CabIsMe/tttn-wine-be/internal"
+	"github.com/CabIsMe/tttn-wine-be/internal/models"
+	"github.com/CabIsMe/tttn-wine-be/internal/services"
+	"github.com/gofiber/fiber/v2"
+)
 
 type ProductHandler interface {
+	AllProductsHandler(ctx *fiber.Ctx) error
 }
 type product_handler struct {
-	services.Services
+	s services.MainServices
 }
 
-func NewProductHandler(s services.Services) ProductHandler {
+func NewProductHandler(s services.MainServices) ProductHandler {
 	return &product_handler{
 		s,
 	}
+}
+func (h *product_handler) AllProductsHandler(ctx *fiber.Ctx) error {
+	results, err := h.s.AllProductsService()
+	if err != nil {
+		return ctx.Status(fiber.StatusOK).JSON(models.Resp{
+			Status: internal.SysStatus.WrongParams.Status,
+			Msg:    internal.SysStatus.WrongParams.Msg,
+		})
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: results,
+	})
 }

@@ -2,14 +2,16 @@ package services
 
 import "github.com/CabIsMe/tttn-wine-be/internal/repositories"
 
-type Services struct {
-	Rp repositories.Repos
+type MainServices struct {
+	repositories.Repos
 	ProductService
+	AuthenticationService
 }
 
-func NewServices(rp repositories.Repos) Services {
-	return Services{
+func NewServices(rp repositories.Repos) MainServices {
+	return MainServices{
 		rp,
 		NewProductService(rp),
+		NewAuthenticationService(rp),
 	}
 }

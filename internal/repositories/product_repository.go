@@ -18,6 +18,7 @@ func NewProductRepository() ProductRepository {
 
 func (r *product_repos) GetAllProducts() ([]models.Product, error) {
 	var products []models.Product
-	err := internal.Db.Debug().Find(&products)
+	var model models.Product
+	err := internal.Db.Debug().Table(model.TableName()).Find(&products)
 	return products, err.Error
 }

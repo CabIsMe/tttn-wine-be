@@ -55,81 +55,13 @@ var Log = NewLogger()
 var Db = NewSQLDB()
 var Pool = NewThreadPool()
 var Validator = validator.New()
-var Domains = InitAPIDomains(Envs.IsProduction)
-var Eps = InitAPIEndpoints()
 var Keys = InitKeys(Envs.IsProduction)
-var Brokers = NewBrokers(Envs.IsProduction)
-var KafkaTopicName = NewKafkaTopicName(Envs.IsProduction)
-var KafkaTopicNameAll = NewKafkaTopicNameAll(Envs.IsProduction)
-var OrderState = InitOrderState()
-
-type OrderStateStruct struct {
-	AccepTask           string
-	AssignTask          string
-	AssignTenant        string
-	Cancel              string
-	CheckIn             string
-	CheckOutFail        string
-	CheckOutSuccess     string
-	ConfirmOrderPrice   string
-	CustomerCancelOrder string
-	Monitoring          string
-	OutCase             string
-	Recall              string
-	DictStateDes        map[string]string
-	TaskStateFinal      []string
-}
-
-func InitOrderState() *OrderStateStruct {
-	// dict state des
-	dictStateDes := make(map[string]string)
-	dictStateDes["ACCEPT_TASK"] = "Nhận tuyến"
-	dictStateDes["ASSIGNED_TASK"] = "Phân tuyến"
-	dictStateDes["ASSIGNED_TENANT"] = "Hệ thống đã phân công tới đối tác"
-	dictStateDes["CANCEL"] = "Hẹn lại khách hàng"
-	dictStateDes["CHECK_IN"] = "Check in nhà khách hàng"
-	dictStateDes["CHECK_OUT_FAIL"] = "Đóng ca - phục vụ thất bại"
-	dictStateDes["CHECK_OUT_SUCCESS"] = "Đóng ca - phục vụ thành công"
-	dictStateDes["CONFIRM_ORDER_PRICE"] = "Nhân viên xác nhận giá đơn hàng"
-	dictStateDes["CUSTOMER_CANCEL_ORDER"] = "Khách hàng hủy đơn hàng"
-	dictStateDes["MORNITORING"] = "Đã xử lý đang theo dõi"
-	dictStateDes["OUT_CASE"] = "Nhả tuyến"
-	dictStateDes["RECALL"] = "Nhả tuyến"
-	// task state final
-	taskStateFinal := []string{"CUSTOMER_CANCEL_ORDER", "CANCEL", "CHECK_OUT_FAIL", "CHECK_OUT_SUCCESS"}
-
-	orderState := &OrderStateStruct{
-		AccepTask:           "ACCEPT_TASK",
-		AssignTask:          "ASSIGNED_TASK",
-		AssignTenant:        "ASSIGN_TENANT",
-		Cancel:              "CANCEL",
-		CheckIn:             "CHECK_IN",
-		CheckOutFail:        "CHECK_OUT_FAIL",
-		CheckOutSuccess:     "CHECK_OUT_SUCCESS",
-		ConfirmOrderPrice:   "CONFIRM_ORDER_PRICE",
-		CustomerCancelOrder: "CUSTOMER_CANCEL_ORDER",
-		Monitoring:          "MONITORING",
-		OutCase:             "OUT_CASE",
-		Recall:              "RECALL",
-		DictStateDes:        dictStateDes,
-		TaskStateFinal:      taskStateFinal,
-	}
-	return orderState
-}
+var MailEnvs = InitMailSender()
 
 type AppKeys struct {
-	TOKEN_SECRET_KEY_WEB     string
-	OrderClientKey           string
-	OrderServiceKey          string
-	PORTAL_FCONNECT_AUTH_KEY string
-	LocalServicesKey         map[string]string
-	PartnerServiceClientKey  string
-	FcOrderServiceClientKey  string
-	ServiceKey               string
-	AddressClientKey         string
-	AddressSecretKey         string
-	HiFPTEcomClientKey       string
-	HiFPTEcomSecrectKey      string
+	ACCESS_TOKEN_SECRET        string
+	REFRESH_TOKEN_SECRET       string
+	INSIDE_ACCESS_TOKEN_SECRET string
 }
 type EnvVars struct {
 	SqlHost      string `mapstructure:"DB_HOST"`
@@ -171,6 +103,12 @@ type ApiEndpoints struct {
 	HiFPTPromotion GroupEndpointHiFPTPromotion
 	HiFPTBilling   GroupEndpointHiFPTBilling
 }
+type MailConfig struct {
+	SMTPHost     string
+	SMTPPort     string
+	MaiFrom      string
+	MailPassword string
+}
 type SystemStatus struct {
 	Status int    `json:"status"`
 	Msg    string `json:"msg"`
@@ -185,6 +123,15 @@ type AllSystemStatus struct {
 	InvalidToken  *SystemStatus
 	SystemBusy    *SystemStatus
 	SystemError   *SystemStatus
+}
+
+func InitMailSender() *MailConfig {
+	return &MailConfig{
+		MaiFrom:      "nguyenbac872001@gmail.com",
+		SMTPHost:     "smtp.gmail.com",
+		SMTPPort:     "587",
+		MailPassword: "fuetfgukqnvqdgtt",
+	}
 }
 
 func InitSystemStatus() *AllSystemStatus {
@@ -219,26 +166,9 @@ func InitSystemStatus() *AllSystemStatus {
 }
 func InitKeys(isProduction bool) *AppKeys {
 	keys := &AppKeys{
-		TOKEN_SECRET_KEY_WEB:     "FCONNECT2_hehelilifsdfjjfjglilieiruwoeiurMsIjH",
-		OrderClientKey:           "49e7828e-adf1-47fe-a355-553332e9da1f",
-		OrderServiceKey:          "5850405d-0242-49e1-808a-c2c4bbbfae84",
-		PORTAL_FCONNECT_AUTH_KEY: "PORTAL_ldsjdhsajdhwclieiruwoeiurMsIjHdasdasd",
-		PartnerServiceClientKey:  "074a8c0b-0478-49cf-897f-36493003451a",
-		AddressClientKey:         "WebkitHiFPT",
-		AddressSecretKey:         "48a970b5c2678204b590b6a997444b19",
-		ServiceKey:               "2d51c978-6a34-4d33-a7b6-1ed7956e2583",
-		HiFPTEcomClientKey:       "hifpt_ecom",
-		HiFPTEcomSecrectKey:      "xxxxxxecom2021",
-	}
-	if isProduction {
-		keys.PartnerServiceClientKey = "5c273964-3581-477c-b442-bc5cd32a3517"
-		keys.ServiceKey = "b7ef02a7-ab9f-449f-9e4f-0b8ffacf3a95"
-
-		keys.OrderClientKey = "fb76a30c-09fc-4889-ab47-dbbb23f50aec"
-		keys.OrderServiceKey = "d7560895-9764-4209-90a4-ba7196180cf8"
-	}
-	keys.LocalServicesKey = map[string]string{
-		"hi-fconnect-partner-management-api": keys.PartnerServiceClientKey,
+		ACCESS_TOKEN_SECRET:        "2250bcba-9227-418d-9d23-6b5492d81de1",
+		REFRESH_TOKEN_SECRET:       "8b93f810-4c3a-452d-9a1a-75101ba7b080",
+		INSIDE_ACCESS_TOKEN_SECRET: "DnEMRqGdoR07HbY-l9xRXWuCo3dnYzNzqoAoOqEZO_EpAOKMql",
 	}
 	return keys
 }
@@ -254,54 +184,7 @@ func logEndcoder() zapcore.Encoder {
 	encodeConfig.EncodeTime = zapcore.RFC3339TimeEncoder
 	return zapcore.NewJSONEncoder(encodeConfig)
 }
-func InitAPIDomains(isProduction bool) *ApiDomains {
-	// staging
-	domain := &ApiDomains{
-		PrivateHiFPT: "http://hifpt-api-stag.fpt.vn",
-		PublicHiFPT:  "https://hifpt-api-stag.fpt.vn",
-		// PublicHiFPT: "http://localhost:3003",
-		UploadUrlHiFPT:      "img_stg",
-		UrlStatic:           "https://hi-static.fpt.vn",
-		UrlHiFConnectOrder:  "http://hi-fconnect-order-management-api-staging:80",
-		UrlCustomerProvider: "http://hi-customer-provider-api-staging",
-		UrlHiEcomPromotion:  "http://hi-ecom-promotion-api-staging:9003",
-		UrlHiEcomBilling:    "http://hi-ecom-billing-api-staging:9004",
-	}
-	// production
-	if isProduction {
-		domain.PrivateHiFPT = "http://hifpt-api.fpt.vn"
-		domain.PublicHiFPT = "https://hifpt-api.fpt.vn"
-		domain.UploadUrlHiFPT = "img"
-		domain.UrlHiFConnectOrder = "http://hi-fconnect-order-management-api:80"
-		domain.UrlCustomerProvider = "http://hi-customer-provider-api"
-		domain.UrlHiEcomPromotion = "http://hi-ecom-promotion-api:9003"
-		domain.UrlHiEcomBilling = "http://hi-ecom-billing-api:9004"
-	}
-	return domain
-}
-func InitAPIEndpoints() *ApiEndpoints {
-	prefixOrder := "/hi-fconnect-order-management-api"
-	prefixPartner := "/hi-fconnect-partner-management-api"
-	prefixAddressProvider := "/customer-provider/location"
-	endpoints := &ApiEndpoints{
-		GetTaskEp:    prefixOrder + "/orders/tasks-state",
-		TaskInfo:     prefixOrder + "/orders/task-info",
-		GetTenantEp:  prefixPartner + "/v1/local/tenant/get",
-		AssignTaskEp: prefixPartner + "/v1/local/tenant/assign-task",
-		GetProvince:  prefixAddressProvider + "/provinces",
-		GetDistrict:  prefixAddressProvider + "/districts",
-		GetWard:      prefixAddressProvider + "/wards",
-		GetStreet:    prefixAddressProvider + "/streets",
-		GetReport:    prefixOrder + "/reports",
-		HiFPTPromotion: GroupEndpointHiFPTPromotion{
-			GetListSkuFrPromotionCode: "/hi-ecom-promotion-api/v1/local/get-skus-fr-promotion-code",
-		},
-		HiFPTBilling: GroupEndpointHiFPTBilling{
-			GetListCsatCSScoreFrOrderId: "/hi-ecom-billing-api/v1/local/recare-get-csat-fr-order-id",
-		},
-	}
-	return endpoints
-}
+
 func InitEnvVars() *EnvVars {
 	fmt.Println("LOADING ENVS...")
 	envs := &EnvVars{}
@@ -367,21 +250,8 @@ func NewThreadPool() *threadpool.ThreadPool {
 	fmt.Println("LOADING THREAD POOL SUCCESS...")
 	return threadPool
 }
-func NewBrokers(useProduction bool) []string {
-	if useProduction {
-		return []string{"isc-kafka01:9092", "isc-kafka02:9092", "isc-kafka03:9092"}
-	}
-	return []string{"isc-kafka01:9092", "isc-kafka02:9092", "isc-kafka03:9092"}
-}
-func NewKafkaTopicName(useProduction bool) string {
-	if useProduction {
-		return "hifpt-hi-ecom-logs"
-	}
-	return "stag-hifpt-hi-ecom-logs"
-}
-func NewKafkaTopicNameAll(useProduction bool) string {
-	if useProduction {
-		return "hifpt-all-in-one-kafka"
-	}
-	return "stag-hifpt-all-in-one-kafka"
-}
+
+// "Access denied. You don't have permission to perform this action."
+// "Invalid input. Please check your data and try again."
+// "Internal server error. Something went wrong on our end. Please try again later." -> Lỗi server
+// "System error. An unexpected error occurred. Please try again later."-> Lỗi hệ thống, Đã xảy ra lỗi không mong muốn trong hệ thống. Vui lòng thử lại sau."

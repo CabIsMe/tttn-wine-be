@@ -1,17 +1,26 @@
 package delivery
 
-import "github.com/CabIsMe/tttn-wine-be/internal/services"
+import (
+	"github.com/CabIsMe/tttn-wine-be/internal/services"
+	"github.com/gofiber/fiber/v2"
+)
 
 type Handlers interface {
+	// checkRequiredFields(requiredFields []string) fiber.Handler
+	VerifyToken(ctx *fiber.Ctx) error
 	ProductHandler
+	AuthenticationHandler
 }
 type handlers struct {
+	services.MainServices
 	ProductHandler
+	AuthenticationHandler
 }
 
-func NewHandlers(services services.Services) Handlers {
+func NewHandlers(s services.MainServices) Handlers {
 	return &handlers{
-		services,
-		NewProductHandler(services),
+		s,
+		NewProductHandler(s),
+		NewAuthenticationHandler(s),
 	}
 }
