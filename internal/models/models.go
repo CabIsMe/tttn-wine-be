@@ -17,6 +17,11 @@ type Category struct {
 	CategoryId   string `json:"category_id"`
 	CategoryName string `json:"category_name"`
 }
+
+func (Category) TableName() string {
+	return "category"
+}
+
 type Provider struct {
 	ProviderId   string `json:"provider_id"`
 	ProviderName string `json:"provider_name"`
@@ -67,17 +72,18 @@ type Employee struct {
 	Email       string    `json:"email"`
 }
 type Product struct {
-	ProductId       string  `json:"product_id"`
-	ProductName     string  `json:"product_name"`
-	Cost            float32 `json:"cost"`
-	ProductImg      string  `json:"product_img"`
-	Description     string  `json:"description"`
-	InventoryNumber int     `json:"inventory_number"`
-	Status          string  `json:"status"`
-	BrandId         string  `json:"brand_id"`
-	CategoryId      string  `json:"category_id"`
-	IsNew           int8    `json:"is_new"`
-	BrandInfo       *Brand  `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
+	ProductId       string    `json:"product_id"`
+	ProductName     string    `json:"product_name"`
+	Cost            float32   `json:"cost"`
+	ProductImg      string    `json:"product_img"`
+	Description     string    `json:"description"`
+	InventoryNumber int       `json:"inventory_number"`
+	Status          string    `json:"status"`
+	BrandId         string    `json:"brand_id"`
+	CategoryId      string    `json:"category_id"`
+	IsNew           int8      `json:"is_new"`
+	BrandInfo       *Brand    `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
+	CategoryInfo    *Category `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
 }
 
 func (Product) TableName() string {
@@ -86,6 +92,9 @@ func (Product) TableName() string {
 
 func (Product) ColumnIsNew() string {
 	return "is_new"
+}
+func (Product) ColumnProductId() string {
+	return "product_id"
 }
 
 type CustomerOrder struct {

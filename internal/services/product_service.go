@@ -9,6 +9,7 @@ import (
 type ProductService interface {
 	AllProductsService() ([]models.Product, *internal.SystemStatus)
 	NewReleaseProductsService() ([]models.Product, *internal.SystemStatus)
+	GetProductService(productId string) (*models.Product, *internal.SystemStatus)
 }
 type product_service struct {
 	rp repositories.Repos
@@ -33,4 +34,11 @@ func (s *product_service) NewReleaseProductsService() ([]models.Product, *intern
 		return nil, internal.SysStatus.DbFailed
 	}
 	return listData, nil
+}
+func (s *product_service) GetProductService(productId string) (*models.Product, *internal.SystemStatus) {
+	result, err := s.rp.GetProduct(productId)
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return result, nil
 }
