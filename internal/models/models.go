@@ -3,11 +3,16 @@ package models
 import "time"
 
 type Brand struct {
-	BrandId   string `json:"brand_id"`
+	BrandId   string `json:"brand_id" gorm:"primaryKey"`
 	BrandName string `json:"brand_name"`
 	BrandImg  string `json:"brand_img"`
 	BrandDesc string `json:"brand_desc"`
 }
+
+func (Brand) TableName() string {
+	return "brand"
+}
+
 type Category struct {
 	CategoryId   string `json:"category_id"`
 	CategoryName string `json:"category_name"`
@@ -71,10 +76,16 @@ type Product struct {
 	Status          string  `json:"status"`
 	BrandId         string  `json:"brand_id"`
 	CategoryId      string  `json:"category_id"`
+	IsNew           int8    `json:"is_new"`
+	BrandInfo       *Brand  `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
 }
 
 func (Product) TableName() string {
 	return "product"
+}
+
+func (Product) ColumnIsNew() string {
+	return "is_new"
 }
 
 type CustomerOrder struct {
