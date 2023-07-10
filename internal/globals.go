@@ -38,14 +38,14 @@ const (
 	CODE_SYSTEM_BUSY    = 300
 	CODE_SYSTEM_ERROR   = 301
 
-	MSG_DB_FAILED      = "Kết nối hệ thống lỗi, vui lòng thử lại sau ít phút"
-	MSG_WRONG_PARAMS   = "Sai thông tin đầu vào, vui lòng kiểm tra lại thông tin"
+	MSG_DB_FAILED      = "Internal server error. Something went wrong on our end. Please try again later."
+	MSG_WRONG_PARAMS   = "Invalid input. Please check your data and try again."
 	MSG_RATE_LIMIT     = "Bạn truy cập quá nhanh."
 	MSG_TOKEN_REQUIRED = "Token không tồn tại"
 	MSG_TOKEN_EXPIRED  = "Token hết hạn"
 	MSG_INVALID_TOKEN  = "Token không hợp lệ"
 	MSG_SYSTEM_BUSY    = "Hệ thống đang bận, vui lòng thử lại sau ít phút"
-	MSG_SYSTEM_ERROR   = "Có lỗi trong quá trình xử lý, vui lòng thử lại sau ít phút"
+	MSG_SYSTEM_ERROR   = "System error. An unexpected error occurred. Please try again later."
 )
 
 var Envs = InitEnvVars()
@@ -252,6 +252,3 @@ func NewThreadPool() *threadpool.ThreadPool {
 }
 
 // "Access denied. You don't have permission to perform this action."
-// "Invalid input. Please check your data and try again."
-// "Internal server error. Something went wrong on our end. Please try again later." -> Lỗi server
-// "System error. An unexpected error occurred. Please try again later."-> Lỗi hệ thống, Đã xảy ra lỗi không mong muốn trong hệ thống. Vui lòng thử lại sau."
