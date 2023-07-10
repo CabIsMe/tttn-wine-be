@@ -48,7 +48,8 @@ var rootCmd = &cobra.Command{
 		// Scheduler
 		// Scan ready tasks 1 minute and trigger when received order
 		schedule.StartAsync()
-		AppServer.Post("/client/list-products", handlers.AllProductsHandler)
+		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
+		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
 		AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
 		AppServer.Post("/client/customer-login", handlers.CustomerLoginHandler)
 
