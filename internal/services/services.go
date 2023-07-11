@@ -6,6 +6,7 @@ type MainServices struct {
 	repositories.Repos
 	ProductService
 	AuthenticationService
+	PromotionService
 }
 
 func NewServices(rp repositories.Repos) MainServices {
@@ -13,5 +14,6 @@ func NewServices(rp repositories.Repos) MainServices {
 		rp,
 		NewProductService(rp),
 		NewAuthenticationService(rp),
+		NewPromotionService(rp),
 	}
 }

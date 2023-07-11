@@ -83,7 +83,7 @@ func (h *auth_handler) CustomerLoginHandler(ctx *fiber.Ctx) error {
 			Detail: utils.ShowErrors(errs),
 		})
 	}
-	accessToken, refreshToken, err := h.MainServices.AuthenticationService.CustomerLoginService(body)
+	accessToken, refreshToken, err := h.MainServices.AuthenticationService.UserLoginService(body)
 	if err != nil {
 		return ctx.Status(http.StatusOK).JSON(err)
 	}

@@ -10,11 +10,13 @@ type Handlers interface {
 	VerifyToken(ctx *fiber.Ctx) error
 	ProductHandler
 	AuthenticationHandler
+	PromotionHandler
 }
 type handlers struct {
 	services.MainServices
 	ProductHandler
 	AuthenticationHandler
+	PromotionHandler
 }
 
 func NewHandlers(s services.MainServices) Handlers {
@@ -22,5 +24,6 @@ func NewHandlers(s services.MainServices) Handlers {
 		s,
 		NewProductHandler(s),
 		NewAuthenticationHandler(s),
+		NewPromotionHandler(s),
 	}
 }

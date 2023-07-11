@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
@@ -15,7 +14,7 @@ import (
 
 type AuthenticationService interface {
 	SignUpUserService(model models.Account) *internal.SystemStatus
-	CustomerLoginService(model models.Account) (interface{}, interface{}, *internal.SystemStatus)
+	UserLoginService(model models.Account) (interface{}, interface{}, *internal.SystemStatus)
 }
 type auth_service struct {
 	rp repositories.Repos
@@ -46,43 +45,72 @@ func (s *auth_service) SignUpUserService(model models.Account) *internal.SystemS
 	return nil
 }
 
-func (s *auth_service) CustomerLoginService(model models.Account) (interface{}, interface{}, *internal.SystemStatus) {
+func (s *auth_service) UserLoginService(model models.Account) (interface{}, interface{}, *internal.SystemStatus) {
 	errResult := internal.SystemStatus{
 		Status: internal.CODE_DB_FAILED,
 		Msg:    internal.MSG_DB_FAILED,
 	}
-
 	user, err := s.rp.GetAccountByUsername(model.Username)
 	if err != nil {
-		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Error(err))
+		internal.Log.Error("Error in UserLoginService", zap.Any("model", model), zap.Error(err))
 		return nil, nil, &errResult
 	}
 	if user == nil {
-		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Any("user", user))
+		internal.Log.Error("Error in UserLoginService", zap.Any("model", model), zap.Any("user", user))
 		return nil, nil, &errResult
 	}
 	if err = bcrypt.CompareHashAndPassword([]byte(user.UserPassword), []byte(model.UserPassword)); err != nil {
-		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Error(err))
+		internal.Log.Error("Error in UserLoginService", zap.Any("model", model), zap.Error(err))
 		return nil, nil, &internal.SystemStatus{
 			Status: internal.CODE_DB_FAILED,
 			Msg:    internal.MSG_DB_FAILED,
 			Detail: "Mật khẩu không chính xác",
 		}
 	}
-	accessToken, err2 := generateUserToken(user.Username, fmt.Sprint(user.RoleId), 1, internal.Keys.ACCESS_TOKEN_SECRET)
-	refreshToken, err3 := generateUserToken(user.Username, "", 24*15, internal.Keys.REFRESH_TOKEN_SECRET)
+	var accessToken, refreshToken string
+	var err2, err3 error
+	if user.RoleId == 2 { // customer
+		customer, err := s.rp.GetCustomerByEmail(user.Username)
+		if err != nil {
+			internal.Log.Error("Error in UserLoginService", zap.Any("model", model), zap.Error(err))
+			return nil, nil, &errResult
+		}
+		if customer == nil {
+			return nil, nil, &internal.SystemStatus{
+				Status: internal.CODE_WRONG_PARAMS,
+				Msg:    internal.MSG_WRONG_PARAMS,
+			}
+		}
+		accessToken, err2 = generateUserToken(user.Username, customer.CustomerId, user.RoleId, 1, internal.Keys.ACCESS_TOKEN_SECRET)
+		refreshToken, err3 = generateUserToken(user.Username, customer.CustomerId, -1, 24*15, internal.Keys.REFRESH_TOKEN_SECRET)
+	} else { // admin
+		employee, err := s.rp.GetEmployeeByEmail(user.Username)
+		if err != nil {
+			internal.Log.Error("Error in UserLoginService", zap.Any("model", model), zap.Error(err))
+			return nil, nil, &errResult
+		}
+		if employee == nil {
+			return nil, nil, &internal.SystemStatus{
+				Status: internal.CODE_WRONG_PARAMS,
+				Msg:    internal.MSG_WRONG_PARAMS,
+			}
+		}
+		accessToken, err2 = generateUserToken(user.Username, employee.EmployeeId, user.RoleId, 1, internal.Keys.INSIDE_ACCESS_TOKEN_SECRET)
+		refreshToken, err3 = generateUserToken(user.Username, employee.EmployeeId, -1, 24*15, internal.Keys.INSIDE_REFRESH_TOKEN_SECRET)
+	}
 	if err2 != nil || err3 != nil {
-		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Error(err2), zap.Error(err3))
+		internal.Log.Error("Error in UserLoginService", zap.Any("model", model), zap.Error(err2), zap.Error(err3))
 		return nil, nil, &errResult
 	}
 	return accessToken, refreshToken, nil
 }
-func generateUserToken(username string, role_id string, expireHours uint16, keyStr string) (string, error) {
+func generateUserToken(username string, userId string, role_id int8, expireHours uint16, keyStr string) (string, error) {
 	now := utils.GetTimeUTC7()
 	claims := jwt.MapClaims{
 		"exp":      now.Add(time.Hour * time.Duration(expireHours)).Unix(),
 		"username": username,
 		"role_id":  role_id,
+		"user_id":  userId,
 		"issuedAt": now,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

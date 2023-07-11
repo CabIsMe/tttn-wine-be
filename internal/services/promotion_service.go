@@ -4,6 +4,7 @@ import (
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
 	"github.com/CabIsMe/tttn-wine-be/internal/repositories"
+	"go.uber.org/zap"
 )
 
 type PromotionService interface {
@@ -19,18 +20,20 @@ func NewPromotionService(rp repositories.Repos) PromotionService {
 	}
 }
 
-func (s *product_service) CreatePromotionService(model models.Promotion) *internal.SystemStatus {
+func (s *promotion_service) CreatePromotionService(model models.Promotion) *internal.SystemStatus {
 	errResult := internal.SystemStatus{
 		Status: internal.CODE_DB_FAILED,
 		Msg:    internal.MSG_DB_FAILED,
 	}
-	empl, err := s.rp.GetEmployee(model.EmployeeId)
+	_, err := s.rp.GetEmployee(model.EmployeeId)
 	if err != nil {
+		internal.Log.Error("CreatePromotionService", zap.Any("GetEmployee", err.Error()))
 		return &errResult
 	}
-	if empl == nil {
-		errResult.Detail = "Employee not found"
+	errCreate := s.rp.CreatePromotion(model)
+	if errCreate != nil {
+		internal.Log.Error("CreatePromotionService", zap.Any("CreatePromotion", errCreate.Error()))
 		return &errResult
 	}
-	err = s.rp.CreatePromotion()
+	return nil
 }

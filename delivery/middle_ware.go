@@ -37,6 +37,7 @@ func (h *handlers) VerifyToken(ctx *fiber.Ctx) error {
 			Msg:    internal.MSG_INVALID_TOKEN,
 		})
 	}
+	ctx.Locals("user_id", claims["user_id"])
 	internal.Log.Info("VerifyToken", zap.Any("info", claims))
 	return ctx.Next()
 }

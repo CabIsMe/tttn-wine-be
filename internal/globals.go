@@ -59,9 +59,10 @@ var Keys = InitKeys(Envs.IsProduction)
 var MailEnvs = InitMailSender()
 
 type AppKeys struct {
-	ACCESS_TOKEN_SECRET        string
-	REFRESH_TOKEN_SECRET       string
-	INSIDE_ACCESS_TOKEN_SECRET string
+	ACCESS_TOKEN_SECRET         string
+	REFRESH_TOKEN_SECRET        string
+	INSIDE_ACCESS_TOKEN_SECRET  string
+	INSIDE_REFRESH_TOKEN_SECRET string
 }
 type EnvVars struct {
 	SqlHost      string `mapstructure:"DB_HOST"`
@@ -166,9 +167,10 @@ func InitSystemStatus() *AllSystemStatus {
 }
 func InitKeys(isProduction bool) *AppKeys {
 	keys := &AppKeys{
-		ACCESS_TOKEN_SECRET:        "2250bcba-9227-418d-9d23-6b5492d81de1",
-		REFRESH_TOKEN_SECRET:       "8b93f810-4c3a-452d-9a1a-75101ba7b080",
-		INSIDE_ACCESS_TOKEN_SECRET: "DnEMRqGdoR07HbY-l9xRXWuCo3dnYzNzqoAoOqEZO_EpAOKMql",
+		ACCESS_TOKEN_SECRET:         "2250bcba-9227-418d-9d23-6b5492d81de1",
+		REFRESH_TOKEN_SECRET:        "8b93f810-4c3a-452d-9a1a-75101ba7b080",
+		INSIDE_ACCESS_TOKEN_SECRET:  "DnEMRqGdoR07HbY-l9xRXWuCo3dnYzNzqoAoOqEZO_EpAOKMql",
+		INSIDE_REFRESH_TOKEN_SECRET: "mXvbxz9P9yMNwQrzwyyPBe-dbJjDoafS1WJP_r4i1_zZllL2yB",
 	}
 	return keys
 }

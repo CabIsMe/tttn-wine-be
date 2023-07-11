@@ -62,6 +62,17 @@ type Customer struct {
 	PhoneNumber string    `json:"phone_number" validate:"max=11,min=10"`
 	Email       string    `json:"email" validate:"required"`
 }
+
+func (Customer) TableName() string {
+	return "customer"
+}
+func (Customer) ColumnCustomerId() string {
+	return "customer_id"
+}
+func (Customer) ColumnEmail() string {
+	return "email"
+}
+
 type Employee struct {
 	EmployeeId  string    `json:"employee_id"`
 	FullName    string    `json:"full_name"`
@@ -77,6 +88,9 @@ func (Employee) TableName() string {
 }
 func (Employee) ColumnEmployeeId() string {
 	return "employee_id"
+}
+func (Employee) ColumnEmail() string {
+	return "email"
 }
 
 type Product struct {
@@ -156,8 +170,14 @@ type Promotion struct {
 	DateStart     time.Time `json:"date_start"`
 	DateEnd       time.Time `json:"date_end"`
 	Description   string    `json:"description"`
-	EmployeeId    string    `json:"employee_id"`
+	EmployeeId    string    `json:"employee_id" validate:"required"`
 	EmployeeInfo  Employee  `json:"employee_info" gorm:"references:EmployeeId;foreignKey:EmployeeId"`
+}
+type PromotionInput struct {
+	PromotionName string `json:"promotion_name"`
+	DateStart     string `json:"date_start"`
+	DateEnd       string `json:"date_end"`
+	Description   string `json:"description"`
 }
 
 func (Promotion) TableName() string {

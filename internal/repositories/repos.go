@@ -5,6 +5,7 @@ type Repos interface {
 	AuthRepository
 	EmployeeRepository
 	PromotionRepository
+	CustomerRepository
 }
 
 type repos struct {
@@ -12,6 +13,7 @@ type repos struct {
 	AuthRepository
 	EmployeeRepository
 	PromotionRepository
+	CustomerRepository
 }
 
 func NewRepos() Repos {
@@ -20,5 +22,6 @@ func NewRepos() Repos {
 		NewAuthRepository(),
 		NewEmployeeRepository(),
 		NewPromotionRepository(),
+		NewCustomerRepository(),
 	}
 }
