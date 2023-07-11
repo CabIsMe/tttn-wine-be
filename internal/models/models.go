@@ -71,6 +71,14 @@ type Employee struct {
 	PhoneNumber string    `json:"phone_number" validate:"max=11,min=10"`
 	Email       string    `json:"email"`
 }
+
+func (Employee) TableName() string {
+	return "employee"
+}
+func (Employee) ColumnEmployeeId() string {
+	return "employee_id"
+}
+
 type Product struct {
 	ProductId       string    `json:"product_id"`
 	ProductName     string    `json:"product_name"`
@@ -140,4 +148,81 @@ type ReturnOrderDetail struct {
 	ReturnOrderId         string `json:"return_order_id"`
 	CustomerOrderDetailId string `json:"customer_order_detail_id"`
 	Amount                int    `json:"amount"`
+}
+
+type Promotion struct {
+	PromotionId   string    `json:"promotion_id" gorm:"primaryKey"`
+	PromotionName string    `json:"promotion_name"`
+	DateStart     time.Time `json:"date_start"`
+	DateEnd       time.Time `json:"date_end"`
+	Description   string    `json:"description"`
+	EmployeeId    string    `json:"employee_id"`
+	EmployeeInfo  Employee  `json:"employee_info" gorm:"references:EmployeeId;foreignKey:EmployeeId"`
+}
+
+func (Promotion) TableName() string {
+	return "promotion"
+}
+
+type PromotionDetail struct {
+	ProductID          string  `json:"product_id" gorm:"primaryKey"`
+	PromotionID        string  `json:"promotion_id" gorm:"primaryKey"`
+	DiscountPercentage float32 `json:"discount_percentage"`
+}
+
+func (PromotionDetail) TableName() string {
+	return "promotion_detail"
+}
+
+type Order struct {
+	OrderId    string    `json:"order_id" gorm:"primaryKey"`
+	TCreate    time.Time `json:"t_create"`
+	ProviderId string    `json:"provider_id"`
+	EmployeeId string    `json:"employee_id"`
+}
+
+func (Order) TableName() string {
+	return "order"
+}
+
+type OrderDetail struct {
+	OrderId   string  `json:"order_id" gorm:"primaryKey"`
+	ProductId string  `json:"product_id" gorm:"primaryKey"`
+	Amount    int     `json:"amount"`
+	Cost      float32 `json:"cost"`
+}
+
+func (OrderDetail) TableName() string {
+	return "order_detail"
+}
+
+type ProvideProduct struct {
+	ProviderId string `json:"provider_id" gorm:"primaryKey"`
+	ProductId  string `json:"product_id" gorm:"primaryKey"`
+}
+
+func (ProvideProduct) TableName() string {
+	return "provide_product"
+}
+
+type Receipt struct {
+	ReceiptId  string    `json:"receipt_id" gorm:"primaryKey"`
+	TCreate    time.Time `json:"t_create"`
+	EmployeeId string    `json:"employee_id"`
+	OrderId    string    `json:"order_id"`
+}
+
+func (Receipt) TableName() string {
+	return "receipt"
+}
+
+type ReceiptDetail struct {
+	ReceiptId string  `json:"receipt_id" gorm:"primaryKey"`
+	ProductId string  `json:"product_id" gorm:"primaryKey"`
+	Amount    int     `json:"amount"`
+	Cost      float32 `json:"cost"`
+}
+
+func (ReceiptDetail) TableName() string {
+	return "receipt_detail"
 }

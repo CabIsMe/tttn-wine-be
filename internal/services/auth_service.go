@@ -57,6 +57,10 @@ func (s *auth_service) CustomerLoginService(model models.Account) (interface{}, 
 		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Error(err))
 		return nil, nil, &errResult
 	}
+	if user == nil {
+		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Any("user", user))
+		return nil, nil, &errResult
+	}
 	if err = bcrypt.CompareHashAndPassword([]byte(user.UserPassword), []byte(model.UserPassword)); err != nil {
 		internal.Log.Error("Error in CustomerLoginService", zap.Any("model", model), zap.Error(err))
 		return nil, nil, &internal.SystemStatus{
