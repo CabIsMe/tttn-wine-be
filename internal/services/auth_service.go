@@ -81,7 +81,8 @@ func (s *auth_service) UserLoginService(model models.Account) (interface{}, inte
 				Msg:    internal.MSG_WRONG_PARAMS,
 			}
 		}
-		accessToken, err2 = generateUserToken(user.Username, customer.CustomerId, user.RoleId, 1, internal.Keys.ACCESS_TOKEN_SECRET)
+		internal.Log.Info("Login in with Customer")
+		accessToken, err2 = generateUserToken(user.Username, customer.CustomerId, user.RoleId, 24, internal.Keys.ACCESS_TOKEN_SECRET)
 		refreshToken, err3 = generateUserToken(user.Username, customer.CustomerId, -1, 24*15, internal.Keys.REFRESH_TOKEN_SECRET)
 	} else { // admin
 		employee, err := s.rp.GetEmployeeByEmail(user.Username)
@@ -95,7 +96,8 @@ func (s *auth_service) UserLoginService(model models.Account) (interface{}, inte
 				Msg:    internal.MSG_WRONG_PARAMS,
 			}
 		}
-		accessToken, err2 = generateUserToken(user.Username, employee.EmployeeId, user.RoleId, 1, internal.Keys.INSIDE_ACCESS_TOKEN_SECRET)
+		internal.Log.Info("Login in with Employee")
+		accessToken, err2 = generateUserToken(user.Username, employee.EmployeeId, user.RoleId, 24, internal.Keys.INSIDE_ACCESS_TOKEN_SECRET)
 		refreshToken, err3 = generateUserToken(user.Username, employee.EmployeeId, -1, 24*15, internal.Keys.INSIDE_REFRESH_TOKEN_SECRET)
 	}
 	if err2 != nil || err3 != nil {

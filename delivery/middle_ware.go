@@ -9,9 +9,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h *handlers) VerifyToken(ctx *fiber.Ctx) error {
+func (h *handlers) VerifyTokenClient(ctx *fiber.Ctx) error {
 	token := string(ctx.Request().Header.Peek("token"))
-	internal.Log.Info("VerifyToken", zap.Any("header", token))
+	internal.Log.Info("VerifyTokenClient", zap.Any("header", token))
 	if utils.IsEmpty(token) {
 		return ctx.Status(fiber.StatusOK).JSON(models.Resp{
 			Status: internal.CODE_TOKEN_REQUIRED,
@@ -38,7 +38,40 @@ func (h *handlers) VerifyToken(ctx *fiber.Ctx) error {
 		})
 	}
 	ctx.Locals("user_id", claims["user_id"])
-	internal.Log.Info("VerifyToken", zap.Any("info", claims))
+	internal.Log.Info("VerifyTokenClient", zap.Any("info", claims))
+	return ctx.Next()
+}
+
+func (h *handlers) VerifyTokenInside(ctx *fiber.Ctx) error {
+	token := string(ctx.Request().Header.Peek("token"))
+	internal.Log.Info("VerifyTokenInside", zap.Any("header", token))
+	if utils.IsEmpty(token) {
+		return ctx.Status(fiber.StatusOK).JSON(models.Resp{
+			Status: internal.CODE_TOKEN_REQUIRED,
+			Msg:    internal.MSG_TOKEN_REQUIRED,
+		})
+	}
+	claims := jwt.MapClaims{}
+	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
+		return []byte(internal.Keys.INSIDE_ACCESS_TOKEN_SECRET), nil
+	})
+	if err != nil {
+		jwtErr := err.(*jwt.ValidationError).Errors
+		if jwtErr == jwt.ValidationErrorExpired {
+			return ctx.Status(fiber.StatusOK).JSON(models.Resp{
+				Status: internal.CODE_TOKEN_EXPIRED,
+				Msg:    internal.MSG_TOKEN_EXPIRED,
+			})
+		}
+	}
+	if parsedToken == nil || !parsedToken.Valid {
+		return ctx.Status(fiber.StatusOK).JSON(models.Resp{
+			Status: internal.CODE_INVALID_TOKEN,
+			Msg:    internal.MSG_INVALID_TOKEN,
+		})
+	}
+	ctx.Locals("user_id", claims["user_id"])
+	internal.Log.Info("VerifyTokenInside", zap.Any("info", claims))
 	return ctx.Next()
 }
 

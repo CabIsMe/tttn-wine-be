@@ -9,6 +9,7 @@ import (
 
 type PromotionService interface {
 	CreatePromotionService(model models.Promotion) *internal.SystemStatus
+	CreatePromotionDetailService(model models.Promotion) *internal.SystemStatus
 }
 type promotion_service struct {
 	rp repositories.Repos
@@ -30,10 +31,25 @@ func (s *promotion_service) CreatePromotionService(model models.Promotion) *inte
 		internal.Log.Error("CreatePromotionService", zap.Any("GetEmployee", err.Error()))
 		return &errResult
 	}
+	isExist, err := s.rp.CheckLogicalPromotionDate(model.DateStart)
+	if err != nil {
+		internal.Log.Error("CreatePromotionService", zap.Any("CheckLogicalPromotionDate", err.Error()))
+		return &errResult
+	}
+	if isExist || model.DateEnd.Unix() <= model.DateStart.Unix() {
+		return &internal.SystemStatus{
+			Status: internal.CODE_WRONG_PARAMS,
+			Msg:    internal.MSG_WRONG_PARAMS,
+			Detail: "Date input invalid",
+		}
+	}
 	errCreate := s.rp.CreatePromotion(model)
 	if errCreate != nil {
 		internal.Log.Error("CreatePromotionService", zap.Any("CreatePromotion", errCreate.Error()))
 		return &errResult
 	}
 	return nil
+}
+func (s *promotion_service) CreatePromotionDetailService(model models.Promotion) *internal.SystemStatus{
+	
 }

@@ -171,8 +171,13 @@ type Promotion struct {
 	DateEnd       time.Time `json:"date_end"`
 	Description   string    `json:"description"`
 	EmployeeId    string    `json:"employee_id" validate:"required"`
-	EmployeeInfo  Employee  `json:"employee_info" gorm:"references:EmployeeId;foreignKey:EmployeeId"`
+	// EmployeeInfo  Employee  `json:"employee_info" gorm:"references:EmployeeId;foreignKey:EmployeeId"`
 }
+
+func (Promotion) ColumnDateEnd() string {
+	return "date_end"
+}
+
 type PromotionInput struct {
 	PromotionName string `json:"promotion_name"`
 	DateStart     string `json:"date_start"`

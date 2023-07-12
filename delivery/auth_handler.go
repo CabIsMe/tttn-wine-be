@@ -14,7 +14,7 @@ import (
 
 type AuthenticationHandler interface {
 	SignUpUserHandler(c *fiber.Ctx) error
-	CustomerLoginHandler(ctx *fiber.Ctx) error
+	UserLoginHandler(ctx *fiber.Ctx) error
 }
 type auth_handler struct {
 	services.MainServices
@@ -66,7 +66,7 @@ func (h *auth_handler) SignUpUserHandler(ctx *fiber.Ctx) error {
 
 }
 
-func (h *auth_handler) CustomerLoginHandler(ctx *fiber.Ctx) error {
+func (h *auth_handler) UserLoginHandler(ctx *fiber.Ctx) error {
 	var body models.Account
 	if err := ctx.BodyParser(&body); err != nil {
 		return ctx.Status(http.StatusOK).JSON(models.Resp{
@@ -74,7 +74,7 @@ func (h *auth_handler) CustomerLoginHandler(ctx *fiber.Ctx) error {
 			Msg:    internal.MSG_WRONG_PARAMS,
 		})
 	}
-	internal.Log.Info("CustomerLoginHandler", zap.Any("username", body))
+	internal.Log.Info("UserLoginHandler", zap.Any("username", body))
 	errs := utils.ValidateStruct(body)
 	if errs != nil {
 		return ctx.Status(http.StatusOK).JSON(models.Resp{

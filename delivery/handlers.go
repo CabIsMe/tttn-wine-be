@@ -7,7 +7,8 @@ import (
 
 type Handlers interface {
 	// checkRequiredFields(requiredFields []string) fiber.Handler
-	VerifyToken(ctx *fiber.Ctx) error
+	VerifyTokenClient(ctx *fiber.Ctx) error
+	VerifyTokenInside(ctx *fiber.Ctx) error
 	ProductHandler
 	AuthenticationHandler
 	PromotionHandler

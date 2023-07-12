@@ -38,31 +38,37 @@ func (h *promotion_handler) CreatePromotionHandler(ctx *fiber.Ctx) error {
 	}()
 	var payload models.PromotionInput
 	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
 		resultError.Detail = err.Error()
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 	errs := utils.ValidateStruct(payload)
 	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
 		resultError.Detail = utils.ShowErrors(errs)
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 	nanoId, err := gonanoid.New()
 	if err != nil {
+		internal.Log.Error("gonanoid", zap.Any("Error", err.Error()))
 		resultError.Detail = err
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
-	dateStart, err := utils.ParseTimeFrStringV2("2006-01-02", payload.DateStart)
-	if err != nil {
-		resultError.Detail = err
+	dateStart, errParse := utils.ParseTimeFrStringV2("Y-M-D", payload.DateStart)
+	if errParse != nil {
+		internal.Log.Error("dateStart", zap.Any("Error", errParse.Error()))
+		resultError.Detail = errParse.Error()
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
-	dateEnd, err := utils.ParseTimeFrStringV2("2006-01-02", payload.DateEnd)
-	if err != nil {
-		resultError.Detail = err
+	dateEnd, errParse := utils.ParseTimeFrStringV2("Y-M-D", payload.DateEnd)
+	if errParse != nil {
+		internal.Log.Error("dateEnd", zap.Any("Error", errParse.Error()))
+		resultError.Detail = errParse.Error()
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 	employeeId, ok := ctx.Locals("user_id").(string)
 	if !ok {
+		internal.Log.Error("employeeId, ok", zap.Any("Error", ok))
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 
@@ -82,7 +88,7 @@ func (h *promotion_handler) CreatePromotionHandler(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(models.Resp{
 		Status: 1,
 		Msg:    "OK",
-		Detail: *promotion,
+		Detail: payload,
 	})
 
 }
