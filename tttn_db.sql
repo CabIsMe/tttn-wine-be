@@ -38,7 +38,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES ('cabcab@gmail.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('davidjohnson@example.com','123',2),('hoangvane@example.com','123',1),('janesmith@example.com','123',2),('johndoe@example.com','123',2),('phamthid@example.com','123',1);
+INSERT INTO `accounts` VALUES ('cabcab@gmail.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('davidjohnson@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('hoangvane@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',1),('janesmith@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('johndoe@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('phamthid@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',1);
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -71,7 +71,7 @@ CREATE TABLE `bill` (
 
 LOCK TABLES `bill` WRITE;
 /*!40000 ALTER TABLE `bill` DISABLE KEYS */;
-INSERT INTO `bill` VALUES ('a',NULL,NULL,NULL,'abc','VsFSmP8AcrU1c84V0gCVk');
+INSERT INTO `bill` VALUES ('a',NULL,NULL,NULL,'abc','EID1689051600');
 /*!40000 ALTER TABLE `bill` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -153,7 +153,7 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-INSERT INTO `customer` VALUES ('gj6xxjLVV8aA3SvrGJZCQ','Lê Quang C',1,'1995-07-10','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0923456789','davidjohnson@example.com'),('hJ5Ly8WYdIrb34MJNnauQ','Nguyễn Văn A',1,'1990-01-15','Số 10, Đường ABC, Quận XYZ, Thành phố HCM','0901234567','johndoe@example.com'),('ks6DKgmOmYH5OGbWPeHg4','Trần Thị B',0,'1985-05-20','Số 20, Đường XYZ, Quận ABC, Thành phố Hà Nội','0912345678','janesmith@example.com');
+INSERT INTO `customer` VALUES ('gj6xxjLVV8aA3SvrGJZCQ','Lê Quang C',1,'1995-07-10','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0923456789','cabcab@gmail.com'),('hJ5Ly8WYdIrb34MJNnauQ','Nguyễn Văn A',1,'1990-01-15','Số 10, Đường ABC, Quận XYZ, Thành phố HCM','0901234567','johndoe@example.com'),('ks6DKgmOmYH5OGbWPeHg4','Trần Thị B',0,'1985-05-20','Số 20, Đường XYZ, Quận ABC, Thành phố Hà Nội','0912345678','janesmith@example.com');
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -191,7 +191,7 @@ CREATE TABLE `customer_order` (
 
 LOCK TABLES `customer_order` WRITE;
 /*!40000 ALTER TABLE `customer_order` DISABLE KEYS */;
-INSERT INTO `customer_order` VALUES ('abc',NULL,NULL,NULL,NULL,NULL,NULL,'VsFSmP8AcrU1c84V0gCVk','VsFSmP8AcrU1c84V0gCVk','gj6xxjLVV8aA3SvrGJZCQ');
+INSERT INTO `customer_order` VALUES ('abc',NULL,NULL,NULL,NULL,NULL,NULL,'EID1689051600','EID1689051600','gj6xxjLVV8aA3SvrGJZCQ');
 /*!40000 ALTER TABLE `customer_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,7 +253,7 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
-INSERT INTO `employee` VALUES ('VsFSmP8AcrU1c84V0gCVk','Phạm Thị D',0,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','phamthid@example.com'),('zZRwcVgDSPhO0EEn2RVyh','Hoàng Văn E',1,'1988-09-25','Số 30, Đường STU, Quận VWX, Thành phố Hải Phòng','0945678901','hoangvane@example.com');
+INSERT INTO `employee` VALUES ('EID1688965200','Hoàng Văn E',1,'1988-09-25','Số 30, Đường STU, Quận VWX, Thành phố Hải Phòng','0945678901','hoangvane@example.com'),('EID1689051600','Phạm Thị D',0,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','phamthid@example.com');
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -299,7 +299,9 @@ CREATE TABLE `order_detail` (
   `amount` int DEFAULT NULL,
   `cost` float DEFAULT NULL,
   PRIMARY KEY (`order_id`,`product_id`),
-  CONSTRAINT `fk_order_product_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`order_id`) ON UPDATE CASCADE
+  KEY `fk_product_order_id_idx` (`product_id`),
+  CONSTRAINT `fk_order_product_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`order_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_order_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -344,7 +346,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',22,'Stocking',1,'BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Out of stock',0,'BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR210079','TW366960');
+INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',49,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',22,'Stocking',1,'BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Out of stock',0,'BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR210079','TW366960');
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -374,6 +376,7 @@ CREATE TABLE `promotion` (
 
 LOCK TABLES `promotion` WRITE;
 /*!40000 ALTER TABLE `promotion` DISABLE KEYS */;
+INSERT INTO `promotion` VALUES ('N5sMhJnFE_3GQXHV9UTUa','new promotion','2023-07-11','2023-07-22','empty','EID1689051600');
 /*!40000 ALTER TABLE `promotion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -401,6 +404,7 @@ CREATE TABLE `promotion_detail` (
 
 LOCK TABLES `promotion_detail` WRITE;
 /*!40000 ALTER TABLE `promotion_detail` DISABLE KEYS */;
+INSERT INTO `promotion_detail` VALUES ('7wS-8EN5-KmDMSumetyIS','N5sMhJnFE_3GQXHV9UTUa',0.5),('mhLO-C5PXeTEIFT24fJDm','N5sMhJnFE_3GQXHV9UTUa',0.2);
 /*!40000 ALTER TABLE `promotion_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -603,4 +607,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-10 18:29:50
+-- Dump completed on 2023-07-13 18:07:32
