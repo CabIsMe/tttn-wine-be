@@ -10,6 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-module/carbon/v2 v2.2.3
 	github.com/lib/pq v1.10.7
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/minio/minio-go/v7 v7.0.50
 	github.com/oddg/hungarian-algorithm v0.0.0-20170809162819-9567cbc363de
 	github.com/segmentio/kafka-go v0.4.39
@@ -23,10 +24,7 @@ require (
 	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11
 )
 
-require (
-	github.com/klauspost/compress v1.16.0 // indirect
-	github.com/matoous/go-nanoid/v2 v2.0.0 // indirect
-)
+require github.com/klauspost/compress v1.16.0 // indirect
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
@@ -72,7 +70,7 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/crypto v0.7.0
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect

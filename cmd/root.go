@@ -53,11 +53,12 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/inside/employee-login", handlers.UserLoginHandler)
 		AppServer.Post("/inside/create-promotion", handlers.VerifyTokenInside, handlers.CreatePromotionHandler)
 		AppServer.Post("/inside/create-promotion-detail", handlers.VerifyTokenInside, handlers.CreatePromotionDetailHandler)
+
 		// Client
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
 		AppServer.Get("/client/list-promotional-products", handlers.PromotionalProductsHandler)
-		AppServer.Post("/client/get-product", handlers.GetProductHandler)
 		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
+		AppServer.Post("/client/get-product", handlers.GetProductHandler)
 		AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
 		AppServer.Post("/client/customer-login", handlers.UserLoginHandler)
 

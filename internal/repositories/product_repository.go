@@ -51,7 +51,9 @@ func (r *product_repos) GetTheTopSellingProducts() ([]models.Product, error) {
 func (r *product_repos) GetNewReleaseProducts() ([]models.Product, error) {
 	var products []models.Product
 	var model models.Product
-	err := internal.Db.Debug().Table(model.TableName()).
+	err := internal.Db.Debug().Select("*").Table(model.TableName()).
+		Preload("BrandInfo").
+		Preload("CategoryInfo").
 		Where(fmt.Sprintf("%s = ?", model.ColumnIsNew()), "1").
 		Find(&products)
 	return products, err.Error
