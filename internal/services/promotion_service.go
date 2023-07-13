@@ -9,7 +9,7 @@ import (
 
 type PromotionService interface {
 	CreatePromotionService(model models.Promotion) *internal.SystemStatus
-	CreatePromotionDetailService(model models.Promotion) *internal.SystemStatus
+	CreatePromotionDetailService(model models.PromotionDetail) *internal.SystemStatus
 }
 type promotion_service struct {
 	rp repositories.Repos
@@ -50,6 +50,18 @@ func (s *promotion_service) CreatePromotionService(model models.Promotion) *inte
 	}
 	return nil
 }
-func (s *promotion_service) CreatePromotionDetailService(model models.Promotion) *internal.SystemStatus{
-	
+func (s *promotion_service) CreatePromotionDetailService(modelInput models.PromotionDetail) *internal.SystemStatus {
+	_, err := s.rp.GetPromotionDetail(modelInput.ProductId, modelInput.PromotionId)
+	errResult := internal.SystemStatus{
+		Status: internal.CODE_DB_FAILED,
+		Msg:    internal.MSG_DB_FAILED,
+	}
+	if err != nil {
+		return &errResult
+	}
+	errCreate := s.rp.CreatePromotionDetail(modelInput)
+	if errCreate != nil {
+		return &errResult
+	}
+	return nil
 }

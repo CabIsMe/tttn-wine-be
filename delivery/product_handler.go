@@ -1,6 +1,8 @@
 package delivery
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
@@ -15,6 +17,7 @@ type ProductHandler interface {
 	AllProductsHandler(ctx *fiber.Ctx) error
 	NewReleaseProductsHandler(ctx *fiber.Ctx) error
 	GetProductHandler(ctx *fiber.Ctx) error
+	PromotionalProductsHandler(ctx *fiber.Ctx) error
 }
 type product_handler struct {
 	s services.MainServices
@@ -76,5 +79,47 @@ func (h *product_handler) GetProductHandler(ctx *fiber.Ctx) error {
 		Status: 1,
 		Msg:    "OK",
 		Detail: result,
+	})
+}
+func (h *product_handler) PromotionalProductsHandler(ctx *fiber.Ctx) error {
+	results, err := h.s.PromotionalProductsService()
+	if err != nil {
+		return ctx.Status(fiber.StatusOK).JSON(err)
+	}
+	jsonData, errMarshal := json.Marshal(results)
+	if errMarshal != nil {
+		fmt.Println("Error:", errMarshal.Error())
+		return ctx.Status(fiber.StatusOK).JSON(errMarshal)
+	}
+	type promotionOutput struct {
+		ProductId           string                 `json:"product_id"`
+		ProductName         string                 `json:"product_name"`
+		Cost                float32                `json:"cost"`
+		ProductImg          string                 `json:"product_img"`
+		Description         string                 `json:"description"`
+		InventoryNumber     int                    `json:"inventory_number"`
+		Status              string                 `json:"status"`
+		BrandId             string                 `json:"-"`
+		CategoryId          string                 `json:"-"`
+		IsNew               int8                   `json:"is_new"`
+		BrandInfo           models.Brand           `json:"brand_info"`
+		CategoryInfo        models.Category        `json:"category_info"`
+		PromotionDetailInfo models.PromotionDetail `json:"promotion_detail_info"`
+		DiscountedCost      float32                `json:"discounted_cost"`
+	}
+	var data []*promotionOutput
+	errMarshal = json.Unmarshal(jsonData, &data)
+	if errMarshal != nil {
+		fmt.Println("Error:", errMarshal.Error())
+		return ctx.Status(fiber.StatusOK).JSON(errMarshal)
+	}
+	for _, item := range data {
+		item.DiscountedCost = item.Cost * item.PromotionDetailInfo.DiscountPercentage
+		fmt.Println(item.DiscountedCost)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: data,
 	})
 }

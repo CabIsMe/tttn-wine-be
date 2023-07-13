@@ -14,7 +14,7 @@ func (Brand) TableName() string {
 }
 
 type Category struct {
-	CategoryId   string `json:"category_id"`
+	CategoryId   string `json:"category_id" gorm:"primaryKey"`
 	CategoryName string `json:"category_name"`
 }
 
@@ -94,18 +94,19 @@ func (Employee) ColumnEmail() string {
 }
 
 type Product struct {
-	ProductId       string    `json:"product_id"`
-	ProductName     string    `json:"product_name"`
-	Cost            float32   `json:"cost"`
-	ProductImg      string    `json:"product_img"`
-	Description     string    `json:"description"`
-	InventoryNumber int       `json:"inventory_number"`
-	Status          string    `json:"status"`
-	BrandId         string    `json:"brand_id"`
-	CategoryId      string    `json:"category_id"`
-	IsNew           int8      `json:"is_new"`
-	BrandInfo       *Brand    `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
-	CategoryInfo    *Category `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
+	ProductId           string           `json:"product_id"`
+	ProductName         string           `json:"product_name"`
+	Cost                float32          `json:"cost"`
+	ProductImg          string           `json:"product_img"`
+	Description         string           `json:"description"`
+	InventoryNumber     int              `json:"inventory_number"`
+	Status              string           `json:"status"`
+	BrandId             string           `json:"-"`
+	CategoryId          string           `json:"-"`
+	IsNew               int8             `json:"is_new"`
+	BrandInfo           *Brand           `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
+	CategoryInfo        *Category        `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
+	PromotionDetailInfo *PromotionDetail `gorm:"references:ProductId;foreignKey:ProductId" json:"promotion_detail_info"`
 }
 
 func (Product) TableName() string {
@@ -177,6 +178,12 @@ type Promotion struct {
 func (Promotion) ColumnDateEnd() string {
 	return "date_end"
 }
+func (Promotion) ColumnDateStart() string {
+	return "date_start"
+}
+func (Promotion) ColumnPromotionId() string {
+	return "promotion_id"
+}
 
 type PromotionInput struct {
 	PromotionName string `json:"promotion_name"`
@@ -190,13 +197,19 @@ func (Promotion) TableName() string {
 }
 
 type PromotionDetail struct {
-	ProductID          string  `json:"product_id" gorm:"primaryKey"`
-	PromotionID        string  `json:"promotion_id" gorm:"primaryKey"`
-	DiscountPercentage float32 `json:"discount_percentage"`
+	ProductId          string  `json:"product_id" gorm:"primaryKey" validate:"required"`
+	PromotionId        string  `json:"promotion_id" gorm:"primaryKey" validate:"required"`
+	DiscountPercentage float32 `json:"discount_percentage" validate:"required,gt=0,lt=1"`
 }
 
 func (PromotionDetail) TableName() string {
 	return "promotion_detail"
+}
+func (PromotionDetail) ColumnProductId() string {
+	return "product_id"
+}
+func (PromotionDetail) ColumnPromotionId() string {
+	return "promotion_id"
 }
 
 type Order struct {

@@ -1,18 +1,22 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type PromotionRepository interface {
 	CreatePromotion(model models.Promotion) error
 	CheckLogicalPromotionDate(dateInput time.Time) (bool, error)
 	GetAllPromotions() ([]models.Promotion, error)
+	GetPromotionDetail(productId string, promotionId string) (*models.PromotionDetail, error)
+	CreatePromotionDetail(model models.PromotionDetail) error
 }
 
 type promotion_repos struct {
@@ -45,4 +49,14 @@ func (r *promotion_repos) GetAllPromotions() ([]models.Promotion, error) {
 }
 func (r *promotion_repos) CreatePromotionDetail(model models.PromotionDetail) error {
 	return internal.Db.Debug().Create(&model).Error
+}
+func (r *promotion_repos) GetPromotionDetail(productId string, promotionId string) (*models.PromotionDetail, error) {
+	model := &models.PromotionDetail{}
+	result := internal.Db.Where(fmt.Sprintf("%s = ? AND %s = ?", model.ColumnProductId(), model.ColumnPromotionId()), productId, promotionId).
+		Take(&model).Error
+	if errors.Is(result, gorm.ErrRecordNotFound) {
+		internal.Log.Error("GetPromotionDetail", zap.Any("Error query", result))
+		return nil, nil
+	}
+	return model, result
 }

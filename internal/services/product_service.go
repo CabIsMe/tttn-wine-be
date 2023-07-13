@@ -10,6 +10,7 @@ type ProductService interface {
 	AllProductsService() ([]models.Product, *internal.SystemStatus)
 	NewReleaseProductsService() ([]models.Product, *internal.SystemStatus)
 	GetProductService(productId string) (*models.Product, *internal.SystemStatus)
+	PromotionalProductsService() ([]models.Product, *internal.SystemStatus)
 }
 type product_service struct {
 	rp repositories.Repos
@@ -41,4 +42,11 @@ func (s *product_service) GetProductService(productId string) (*models.Product, 
 		return nil, internal.SysStatus.DbFailed
 	}
 	return result, nil
+}
+func (s *product_service) PromotionalProductsService() ([]models.Product, *internal.SystemStatus) {
+	listData, err := s.rp.GetPromotionalProducts()
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return listData, nil
 }

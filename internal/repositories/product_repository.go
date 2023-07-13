@@ -15,6 +15,7 @@ type ProductRepository interface {
 	GetTheTopSellingProducts() ([]models.Product, error)
 	GetNewReleaseProducts() ([]models.Product, error)
 	GetProduct(productId string) (*models.Product, error)
+	GetPromotionalProducts() ([]models.Product, error)
 }
 
 type product_repos struct {
@@ -28,10 +29,10 @@ func (r *product_repos) GetAllProducts() ([]models.Product, error) {
 	var products []models.Product
 	var model models.Product
 	err := internal.Db.Debug().
-		Select("product.*, brand.brand_name").
+		Select("*").
 		Table(model.TableName()).
-		Joins("JOIN brand ON product.brand_id = brand.brand_id").
 		Preload("BrandInfo").
+		Preload("CategoryInfo").
 		Find(&products).Error
 	return products, err
 }
@@ -67,4 +68,22 @@ func (r *product_repos) GetProduct(productId string) (*models.Product, error) {
 		return nil, nil
 	}
 	return model, result
+}
+func (r *product_repos) GetPromotionalProducts() ([]models.Product, error) {
+	var products []models.Product
+	var product models.Product
+	var promotion models.Promotion
+	var promotionDetail models.PromotionDetail
+	where := fmt.Sprintf("%s in (select %s from %s as pd where pd.%s = (select %s from %s as p where now() between p.%s and p.%s))",
+		product.ColumnProductId(), product.ColumnProductId(), promotionDetail.TableName(), promotionDetail.ColumnPromotionId(), promotion.ColumnPromotionId(),
+		promotion.TableName(), promotion.ColumnDateStart(), promotion.ColumnDateEnd())
+	err := internal.Db.Debug().
+		Select("*").
+		Table(product.TableName()).
+		Where(where).
+		Preload("BrandInfo").
+		Preload("CategoryInfo").
+		Preload("PromotionDetailInfo").
+		Find(&products).Error
+	return products, err
 }
