@@ -2,6 +2,8 @@ package models
 
 import "time"
 
+var Cos = InitCustomerOrderStatusObject()
+
 type Brand struct {
 	BrandId   string `json:"brand_id" gorm:"primaryKey"`
 	BrandName string `json:"brand_name"`
@@ -119,18 +121,46 @@ func (Product) ColumnIsNew() string {
 func (Product) ColumnProductId() string {
 	return "product_id"
 }
+func (Product) ColumnProductName() string {
+	return "product_name"
+}
+func (Product) ColumnInventoryNumber() string {
+	return "inventory_number"
+}
 
 type CustomerOrder struct {
-	CustomerOrderId string    `json:"customer_order_id"`
-	TCreate         time.Time `json:"t_create"`
-	FullName        string    `json:"full_name"`
-	Address         string    `json:"address"`
-	PhoneNumber     string    `json:"phone_number"`
-	TDelivery       time.Time `json:"t_delivery"`
-	Status          int       `json:"status"`
-	EmployeeId      string    `json:"employee_id"`
-	DelivererId     string    `json:"deliverer_id"`
-	CustomerId      string    `json:"customer_id"`
+	CustomerOrderId         string                `json:"customer_order_id"`
+	TCreate                 time.Time             `json:"t_create"`
+	FullName                string                `json:"full_name"`
+	Address                 string                `json:"address" validate:"required"`
+	PhoneNumber             string                `json:"phone_number" validate:"required"`
+	TDelivery               time.Time             `json:"t_delivery" validate:"required"`
+	Status                  int8                  `json:"status" validate:"required"`
+	EmployeeId              string                `json:"employee_id"`
+	DelivererId             string                `json:"deliverer_id"`
+	CustomerId              string                `json:"customer_id"`
+	CustomerOrderDetailInfo []CustomerOrderDetail `gorm:"foreignKey:CustomerOrderId;references:CustomerOrderId" json:"customer_order_detail_info"`
+}
+
+type CustomerOrderStatusObject struct {
+	UNAPPROVED        CustomerOrderStatus
+	ORDER_CONFIRM     CustomerOrderStatus
+	CHECK_OUT_SUCCESS CustomerOrderStatus
+	CHECK_OUT_FAIL    CustomerOrderStatus
+}
+
+func InitCustomerOrderStatusObject() *CustomerOrderStatusObject {
+	return &CustomerOrderStatusObject{
+		UNAPPROVED:        CustomerOrderStatus{1, "The order has not been approved."},
+		ORDER_CONFIRM:     CustomerOrderStatus{2, "Appoint delivery personnel"},
+		CHECK_OUT_SUCCESS: CustomerOrderStatus{3, "Check out success"},
+		CHECK_OUT_FAIL:    CustomerOrderStatus{4, "Order has been canceled."},
+	}
+}
+
+type CustomerOrderStatus struct {
+	StatusCode int8
+	StatusDesc string
 }
 
 func (c *CustomerOrder) TableName() string {

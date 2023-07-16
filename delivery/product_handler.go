@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
@@ -17,6 +18,7 @@ type ProductHandler interface {
 	AllProductsHandler(ctx *fiber.Ctx) error
 	NewReleaseProductsHandler(ctx *fiber.Ctx) error
 	GetProductHandler(ctx *fiber.Ctx) error
+	GetProductByNameHandler(ctx *fiber.Ctx) error
 	PromotionalProductsHandler(ctx *fiber.Ctx) error
 }
 type product_handler struct {
@@ -81,6 +83,35 @@ func (h *product_handler) GetProductHandler(ctx *fiber.Ctx) error {
 		Detail: result,
 	})
 }
+func (h *product_handler) GetProductByNameHandler(ctx *fiber.Ctx) error {
+	body := &struct {
+		ProductName string `json:"product_name" validate:"required"`
+	}{}
+	if err := ctx.BodyParser(&body); err != nil {
+		return ctx.Status(http.StatusOK).JSON(models.Resp{
+			Status: internal.CODE_WRONG_PARAMS,
+			Msg:    internal.MSG_WRONG_PARAMS,
+		})
+	}
+	internal.Log.Info("GetProductByNameHandler", zap.Any("product_name", body))
+	errs := utils.ValidateStruct(body)
+	if errs != nil {
+		return ctx.Status(http.StatusOK).JSON(models.Resp{
+			Status: internal.CODE_WRONG_PARAMS,
+			Msg:    internal.MSG_WRONG_PARAMS,
+			Detail: utils.ShowErrors(errs),
+		})
+	}
+	result, err := h.s.GetProductsByNameService(body.ProductName)
+	if err != nil {
+		return ctx.Status(200).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: result,
+	})
+}
 func (h *product_handler) PromotionalProductsHandler(ctx *fiber.Ctx) error {
 	results, err := h.s.PromotionalProductsService()
 	if err != nil {
@@ -114,9 +145,12 @@ func (h *product_handler) PromotionalProductsHandler(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusOK).JSON(errMarshal)
 	}
 	for _, item := range data {
-		item.DiscountedCost = item.Cost * item.PromotionDetailInfo.DiscountPercentage
+		item.DiscountedCost = item.Cost * (1 - item.PromotionDetailInfo.DiscountPercentage)
 		fmt.Println(item.DiscountedCost)
 	}
+	sort.SliceStable(data, func(i, j int) bool {
+		return data[i].PromotionDetailInfo.DiscountPercentage*100 > data[j].PromotionDetailInfo.DiscountPercentage*100
+	})
 	return ctx.Status(http.StatusOK).JSON(models.Resp{
 		Status: 1,
 		Msg:    "OK",

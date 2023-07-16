@@ -59,8 +59,10 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/list-promotional-products", handlers.PromotionalProductsHandler)
 		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
 		AppServer.Post("/client/get-product", handlers.GetProductHandler)
+		AppServer.Post("/client/get-product-by-name", handlers.GetProductByNameHandler)
 		AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
 		AppServer.Post("/client/customer-login", handlers.UserLoginHandler)
+		AppServer.Post("/client/create-customer-order", handlers.VerifyTokenClient, handlers.CreateCustomerOrder)
 
 		if err := AppServer.Listen(":" + internal.Envs.ServicePort); err != nil {
 			fmt.Println("Fiber server got error ", err)

@@ -15,6 +15,7 @@ type ProductRepository interface {
 	GetTheTopSellingProducts() ([]models.Product, error)
 	GetNewReleaseProducts() ([]models.Product, error)
 	GetProduct(productId string) (*models.Product, error)
+	GetProductsByName(productName string) ([]models.Product, error)
 	GetPromotionalProducts() ([]models.Product, error)
 }
 
@@ -70,6 +71,15 @@ func (r *product_repos) GetProduct(productId string) (*models.Product, error) {
 		return nil, nil
 	}
 	return model, result
+}
+func (r *product_repos) GetProductsByName(productName string) ([]models.Product, error) {
+	listModels := []models.Product{}
+	model := models.Product{}
+	result := internal.Db.Where(fmt.Sprintf("%s LIKE ?", model.ColumnProductName()), "%"+productName+"%").
+		Preload("BrandInfo").
+		Preload("CategoryInfo").
+		Find(&listModels).Error
+	return listModels, result
 }
 func (r *product_repos) GetPromotionalProducts() ([]models.Product, error) {
 	var products []models.Product

@@ -13,7 +13,6 @@ import (
 type AuthRepository interface {
 	CreateAccountUser(payload models.Account) error
 	GetAccountByUsername(username string) (*models.Account, error)
-	
 }
 
 type auth_repos struct {

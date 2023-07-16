@@ -22,9 +22,9 @@ func NewCustomerRepository() CustomerRepository {
 	return &customer_repos{}
 }
 
-func (r *customer_repos) GetCustomer(empId string) (*models.Customer, error) {
+func (r *customer_repos) GetCustomer(customerId string) (*models.Customer, error) {
 	model := &models.Customer{}
-	result := internal.Db.Where(fmt.Sprintf("%s = ?", model.ColumnCustomerId()), empId).First(&model).Error
+	result := internal.Db.Where(fmt.Sprintf("%s = ?", model.ColumnCustomerId()), customerId).First(&model).Error
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		internal.Log.Error("GetCustomer", zap.Any("Error query", result))
 		return nil, nil
