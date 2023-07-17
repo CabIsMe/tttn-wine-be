@@ -133,11 +133,11 @@ type CustomerOrder struct {
 	TCreate                 time.Time             `json:"t_create"`
 	FullName                string                `json:"full_name"`
 	Address                 string                `json:"address" validate:"required"`
-	PhoneNumber             string                `json:"phone_number" validate:"required"`
+	PhoneNumber             string                `json:"phone_number" validate:"required,max=11,min=10""`
 	TDelivery               time.Time             `json:"t_delivery" validate:"required"`
 	Status                  int8                  `json:"status" validate:"required"`
-	EmployeeId              string                `json:"employee_id"`
-	DelivererId             string                `json:"deliverer_id"`
+	EmployeeId              *string               `json:"employee_id"`
+	DelivererId             *string               `json:"deliverer_id"`
 	CustomerId              string                `json:"customer_id"`
 	CustomerOrderDetailInfo []CustomerOrderDetail `gorm:"foreignKey:CustomerOrderId;references:CustomerOrderId" json:"customer_order_detail_info"`
 }
@@ -169,10 +169,14 @@ func (c *CustomerOrder) TableName() string {
 
 type CustomerOrderDetail struct {
 	CustomerOrderDetailId string  `json:"customer_order_detail_id"`
-	ProductId             string  `json:"product_id"`
+	ProductId             string  `json:"product_id" validate:"required"`
 	CustomerOrderId       string  `json:"customer_order_id"`
-	Amount                int     `json:"amount"`
-	Cost                  float32 `json:"cost"`
+	Amount                int     `json:"amount" validate:"required"`
+	Cost                  float32 `json:"cost" validate:"required"`
+}
+
+func (CustomerOrderDetail) TableName() string {
+	return "customer_order_detail"
 }
 
 type Bill struct {
@@ -293,4 +297,14 @@ type ReceiptDetail struct {
 
 func (ReceiptDetail) TableName() string {
 	return "receipt_detail"
+}
+
+type Cart struct {
+	CustomerId string `json:"customer_id"`
+	ProductId  string `json:"product_id"`
+	Amount     int    `json:"amount"`
+}
+
+func (Cart) TableName() string {
+	return "cart"
 }

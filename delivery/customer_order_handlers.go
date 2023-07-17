@@ -13,6 +13,8 @@ import (
 
 type CustomerOrderHandler interface {
 	CreateCustomerOrder(ctx *fiber.Ctx) error
+	AddProductsToCartHandler(ctx *fiber.Ctx) error
+	RemoveProductsToCartHandler(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -46,8 +48,6 @@ func (h *c_order_handler) CreateCustomerOrder(ctx *fiber.Ctx) error {
 		PhoneNumber             string                        `json:"phone_number" validate:"required"`
 		TDelivery               string                        `json:"t_delivery" validate:"required"`
 		Status                  string                        `json:"status"`
-		EmployeeId              string                        `json:"employee_id"`
-		DelivererId             string                        `json:"deliverer_id"`
 		CustomerOrderDetailInfo []*models.CustomerOrderDetail `json:"customer_order_detail_info"`
 	}
 	var payload customerOrderInput
@@ -76,8 +76,6 @@ func (h *c_order_handler) CreateCustomerOrder(ctx *fiber.Ctx) error {
 		Address:     payload.Address,
 		PhoneNumber: payload.PhoneNumber,
 		TDelivery:   dateDelivery,
-		EmployeeId:  "",
-		DelivererId: "",
 		CustomerId:  customerId,
 	}
 
@@ -86,5 +84,89 @@ func (h *c_order_handler) CreateCustomerOrder(ctx *fiber.Ctx) error {
 	if errCreate != nil {
 		return ctx.Status(http.StatusOK).JSON(errCreate)
 	}
-	return nil
+	output := make(map[string]interface{})
+	output["customerOrder"] = inputData
+	output["customerOrderDetail"] = payload.CustomerOrderDetailInfo
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: output,
+	})
+}
+
+func (h *c_order_handler) AddProductsToCartHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	customerId, ok := ctx.Locals("user_id").(string)
+	if !ok {
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	defer func() {
+		internal.Log.Info("AddProductsToCartHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	var payload models.Cart
+	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
+		resultError.Detail = err.Error()
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	payload.CustomerId = customerId
+	errAdd := h.MainServices.CustomerOrderService.AddProductsToCartService(payload)
+	if errAdd != nil {
+		return ctx.Status(http.StatusOK).JSON(errAdd)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+	})
+}
+func (h *c_order_handler) RemoveProductsToCartHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	customerId, ok := ctx.Locals("user_id").(string)
+	if !ok {
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	defer func() {
+		internal.Log.Info("RemoveProductsToCartHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	var payload models.Cart
+	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
+		resultError.Detail = err.Error()
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	payload.CustomerId = customerId
+	errAdd := h.MainServices.CustomerOrderService.RemoveProductsToCartService(payload)
+	if errAdd != nil {
+		return ctx.Status(http.StatusOK).JSON(errAdd)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+	})
 }
