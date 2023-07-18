@@ -122,6 +122,7 @@ func (h *c_order_handler) AddProductsToCartHandler(ctx *fiber.Ctx) error {
 		resultError.Detail = utils.ShowErrors(errs)
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
+	// customer_id from jwt
 	payload.CustomerId = customerId
 	errAdd := h.MainServices.CustomerOrderService.AddProductsToCartService(payload)
 	if errAdd != nil {

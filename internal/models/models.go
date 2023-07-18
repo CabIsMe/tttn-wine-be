@@ -133,7 +133,7 @@ type CustomerOrder struct {
 	TCreate                 time.Time             `json:"t_create"`
 	FullName                string                `json:"full_name"`
 	Address                 string                `json:"address" validate:"required"`
-	PhoneNumber             string                `json:"phone_number" validate:"required,max=11,min=10""`
+	PhoneNumber             string                `json:"phone_number" validate:"max=11,min=10"`
 	TDelivery               time.Time             `json:"t_delivery" validate:"required"`
 	Status                  int8                  `json:"status" validate:"required"`
 	EmployeeId              *string               `json:"employee_id"`
@@ -300,9 +300,10 @@ func (ReceiptDetail) TableName() string {
 }
 
 type Cart struct {
-	CustomerId string `json:"customer_id"`
-	ProductId  string `json:"product_id"`
-	Amount     int    `json:"amount"`
+	CustomerId string  `json:"customer_id"`
+	ProductId  string  `json:"product_id"`
+	Amount     int     `json:"amount"`
+	Cost       float32 `json:"cost"`
 }
 
 func (Cart) TableName() string {

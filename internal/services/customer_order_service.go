@@ -1,6 +1,9 @@
 package services
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
 	"github.com/CabIsMe/tttn-wine-be/internal/repositories"
@@ -12,6 +15,7 @@ type CustomerOrderService interface {
 	CreateCustomerOrderService(customerOrder models.CustomerOrder, customerOrderDetails []*models.CustomerOrderDetail) *internal.SystemStatus
 	AddProductsToCartService(cart models.Cart) *internal.SystemStatus
 	RemoveProductsToCartService(cart models.Cart) *internal.SystemStatus
+	AllProductsInCartService(customerId string) ([]models.Cart, *internal.SystemStatus)
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -91,8 +95,16 @@ func (s *c_order_service) CreateCustomerOrderService(
 }
 
 func (s *c_order_service) AddProductsToCartService(cart models.Cart) *internal.SystemStatus {
+
 	errCreate := s.rp.AddProductsToCart(cart)
 	if errCreate != nil {
+		if strings.Contains(errCreate.Error(), "Duplicate entry") {
+			return &internal.SystemStatus{
+				Status: internal.CODE_DB_FAILED,
+				Msg:    internal.MSG_DB_FAILED,
+				Detail: "The product has been added to cart",
+			}
+		}
 		return &internal.SystemStatus{
 			Status: internal.CODE_DB_FAILED,
 			Msg:    internal.MSG_DB_FAILED,
@@ -111,4 +123,64 @@ func (s *c_order_service) RemoveProductsToCartService(cart models.Cart) *interna
 		}
 	}
 	return nil
+}
+
+func (s *c_order_service) AllProductsInCartService(customerId string) ([]models.Cart, *internal.SystemStatus) {
+	errResult := &internal.SystemStatus{
+		Status: internal.CODE_DB_FAILED,
+		Msg:    internal.MSG_DB_FAILED,
+	}
+	products, err := s.rp.GetAllProductsInCart(customerId)
+	if err != nil {
+		errResult.Detail = err.Error()
+		return nil, errResult
+	}
+	prom, err := s.rp.GetPromotionByDate()
+	if err != nil {
+		errResult.Detail = err.Error()
+		return nil, errResult
+	}
+	if prom == nil {
+		for _, model := range products {
+			product, errPro := s.rp.GetProduct(model.ProductId)
+			if errPro != nil {
+				errResult.Detail = errPro.Error()
+				return nil, errResult
+			}
+			if product == nil || product.InventoryNumber < model.Amount {
+				errResult.Detail = fmt.Sprintf("%s is no longer available or has sold out.", product.ProductName)
+				return nil, errResult
+			}
+			model.Cost = product.Cost
+		}
+		return products, nil
+	}
+	for _, model := range products {
+		promDetail, errProm := s.rp.GetPromotionDetail(model.ProductId, prom.PromotionId)
+		if errProm != nil {
+			errResult.Detail = errProm.Error()
+			return nil, errResult
+		}
+		product, errPro := s.rp.GetProduct(model.ProductId)
+		if errPro != nil {
+			errResult.Detail = errPro.Error()
+			return nil, errResult
+		}
+		// promotion detaill is null -> assign cost data =  cost product
+		if promDetail == nil {
+			if product == nil || product.InventoryNumber < model.Amount {
+				errResult.Detail = fmt.Sprintf("%s is no longer available or has sold out.", product.ProductName)
+				return nil, errResult
+			}
+			model.Cost = product.Cost
+			continue
+		}
+		// promotion detail not null -> assign cost data= cost product * (1- %discount)
+		if product == nil || product.InventoryNumber < model.Amount {
+			errResult.Detail = fmt.Sprintf("%s is no longer available or has sold out.", product.ProductName)
+			return nil, errResult
+		}
+		model.Cost = product.Cost * (1 - promDetail.DiscountPercentage)
+	}
+	return products, nil
 }

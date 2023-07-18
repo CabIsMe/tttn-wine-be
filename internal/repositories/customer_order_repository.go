@@ -13,6 +13,7 @@ type CustomerOrderRepository interface {
 	CreateCustomerOrder(customerOrder models.CustomerOrder, listDetails []*models.CustomerOrderDetail) error
 	AddProductsToCart(cart models.Cart) error
 	RemoveProductsToCart(cart models.Cart) error
+	GetAllProductsInCart(customerId string) ([]models.Cart, error)
 }
 
 type c_order_repos struct {
@@ -63,4 +64,14 @@ func (r *c_order_repos) AddProductsToCart(cart models.Cart) error {
 }
 func (r *c_order_repos) RemoveProductsToCart(cart models.Cart) error {
 	return internal.Db.Debug().Where("customer_id = ? AND product_id = ?", cart.CustomerId, cart.ProductId).Delete(&cart).Error
+}
+func (r *c_order_repos) GetAllProductsInCart(customerId string) ([]models.Cart, error) {
+	var products []models.Cart
+	err := internal.Db.Debug().Select("*").
+		Table("cart").Find(&products)
+	if err.Error != nil {
+		return nil, err.Error
+	}
+	internal.Log.Info("GetAllProductsInCart", zap.Any("Number of records: ", err.RowsAffected))
+	return products, nil
 }

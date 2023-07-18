@@ -15,6 +15,7 @@ type PromotionRepository interface {
 	CreatePromotion(model models.Promotion) error
 	CheckLogicalPromotionDate(dateInput time.Time) (bool, error)
 	GetAllPromotions() ([]models.Promotion, error)
+	GetPromotionByDate() (*models.Promotion, error)
 	GetPromotionDetail(productId string, promotionId string) (*models.PromotionDetail, error)
 	CreatePromotionDetail(model models.PromotionDetail) error
 }
@@ -56,6 +57,17 @@ func (r *promotion_repos) GetPromotionDetail(productId string, promotionId strin
 		Take(&model).Error
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		internal.Log.Error("GetPromotionDetail", zap.Any("Error query", result))
+		return nil, nil
+	}
+	return model, result
+}
+
+func (r *promotion_repos) GetPromotionByDate() (*models.Promotion, error) {
+	model := &models.Promotion{}
+	result := internal.Db.Where(fmt.Sprintf("now() between %s and %s", model.DateStart, model.DateEnd)).
+		Take(&model).Error
+	if errors.Is(result, gorm.ErrRecordNotFound) {
+		internal.Log.Error("GetPromotionByDate", zap.Any("Error query", result))
 		return nil, nil
 	}
 	return model, result
