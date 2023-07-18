@@ -71,7 +71,6 @@ CREATE TABLE `bill` (
 
 LOCK TABLES `bill` WRITE;
 /*!40000 ALTER TABLE `bill` DISABLE KEYS */;
-INSERT INTO `bill` VALUES ('a',NULL,NULL,NULL,'abc','EID1689051600');
 /*!40000 ALTER TABLE `bill` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -99,6 +98,33 @@ LOCK TABLES `brand` WRITE;
 /*!40000 ALTER TABLE `brand` DISABLE KEYS */;
 INSERT INTO `brand` VALUES ('BR044023','Carlo Rossi','https://wineshop.vn/public/uploaded/product_brand/product_brand_13.jpg','A smooth and full-bodied red wine with aromas of ripe cherries, vanilla, and a touch of oak. Enjoy it with grilled meats or hearty pasta dishes.'),('BR210079','Yellow Tail','https://wineshop.vn/public/uploaded/product_brand/product_brand_15.png','A medium-bodied and well-balanced red wine with red fruit flavors, gentle tannins, and a touch of earthiness. Enjoy it with roasted poultry or grilled vegetables.'),('BR530964','Woodbridge Mondavi','https://wineshop.vn/public/uploaded/product_brand/san-mazano.jpg','A complex and aromatic white wine with tropical fruit flavors, hints of honey, and a refreshing acidity. Pair it with spicy Asian cuisine or creamy cheeses.'),('BR556729','Peter Vella','https://wineshop.vn/public/uploaded/product_brand/product_brand_16.png','A crisp and lively sparkling wine with delicate bubbles and vibrant notes of green apples and citrus. Celebrate any occasion with a glass of this sparkling delight.'),('BR689371','Barefoot Cellars','https://wineshop.vn/public/uploaded/product_brand/home-korta.jpg','An elegant and crisp white wine with refreshing citrus flavors and a touch of floral aroma. Ideal for pairing with seafood or salads.'),('BR729998','Franzia','https://wineshop.vn/public/uploaded/product_brand/francis-ford.png','A rich and velvety red wine with notes of dark berries, cocoa, and a hint of spice. Perfect for cozy evenings by the fireplace.'),('BR908082','Twin Valley','https://wineshop.vn/public/uploaded/product_brand/product_brand_9.png','A bold and robust red wine with intense blackberry and plum flavors, balanced by velvety tannins and a long, lingering finish. Perfect for steak or barbecued ribs.'),('BR964479','Sutter Home','https://wineshop.vn/public/uploaded/product_brand/product_brand_7.png','A vibrant and fruity rosé wine with flavors of fresh strawberries, watermelon, and a zesty finish. Best served chilled on warm summer days.');
 /*!40000 ALTER TABLE `brand` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cart`
+--
+
+DROP TABLE IF EXISTS `cart`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cart` (
+  `customer_id` char(25) NOT NULL,
+  `product_id` char(25) NOT NULL,
+  `amount` int NOT NULL,
+  PRIMARY KEY (`customer_id`,`product_id`),
+  KEY `fk_cart_product_id_idx` (`product_id`),
+  CONSTRAINT `fk_cart_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_cart_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cart`
+--
+
+LOCK TABLES `cart` WRITE;
+/*!40000 ALTER TABLE `cart` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cart` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -169,11 +195,11 @@ CREATE TABLE `customer_order` (
   `t_create` datetime DEFAULT NULL,
   `full_name` varchar(100) DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
-  `phone_number` varchar(1) DEFAULT NULL,
+  `phone_number` varchar(11) DEFAULT NULL,
   `t_delivery` datetime DEFAULT NULL,
   `status` tinyint DEFAULT NULL,
-  `employee_id` char(25) NOT NULL,
-  `deliverer_id` char(25) NOT NULL,
+  `employee_id` char(25) DEFAULT NULL,
+  `deliverer_id` char(25) DEFAULT NULL,
   `customer_id` char(25) NOT NULL,
   PRIMARY KEY (`customer_order_id`),
   KEY `customer_order_customer_id_idx` (`customer_id`),
@@ -191,7 +217,7 @@ CREATE TABLE `customer_order` (
 
 LOCK TABLES `customer_order` WRITE;
 /*!40000 ALTER TABLE `customer_order` DISABLE KEYS */;
-INSERT INTO `customer_order` VALUES ('abc',NULL,NULL,NULL,NULL,NULL,NULL,'EID1689051600','EID1689051600','gj6xxjLVV8aA3SvrGJZCQ');
+INSERT INTO `customer_order` VALUES ('lB7EGZNOdKOIx-CmRMS9_','2023-07-17 11:59:58','','aslkjdas','0238478','2023-07-19 00:00:00',1,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ'),('M4HCLARFh9x92nqKn8HSA','2023-07-17 12:00:35','','aslkjdas','0238478','2023-07-19 00:00:00',1,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ');
 /*!40000 ALTER TABLE `customer_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -222,6 +248,7 @@ CREATE TABLE `customer_order_detail` (
 
 LOCK TABLES `customer_order_detail` WRITE;
 /*!40000 ALTER TABLE `customer_order_detail` DISABLE KEYS */;
+INSERT INTO `customer_order_detail` VALUES ('2AAQQaD2hFBlYm9QItHeG','7wS-8EN5-KmDMSumetyIS','M4HCLARFh9x92nqKn8HSA',5,100),('oEGbtgJQ9vOiTD984UKk7','7wS-8EN5-KmDMSumetyIS','lB7EGZNOdKOIx-CmRMS9_',4,100);
 /*!40000 ALTER TABLE `customer_order_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -346,7 +373,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',49,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',22,'Stocking',1,'BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Out of stock',0,'BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR210079','TW366960');
+INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',49,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',7,'Stocking',1,'BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Out of stock',0,'BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Korta Reseva De Familia',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',0,'BR210079','TW366960');
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -607,4 +634,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-13 18:07:32
+-- Dump completed on 2023-07-18 20:35:19
