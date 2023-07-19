@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 var Cos = InitCustomerOrderStatusObject()
 
@@ -57,10 +60,10 @@ type Role struct {
 }
 type Customer struct {
 	CustomerId  string    `json:"customer_id"`
-	FullName    string    `json:"full_name"`
-	Gender      string    `json:"gender"`
+	FullName    string    `json:"full_name" validate:"required"`
+	Gender      int8      `json:"gender"`
 	DateOfBirth time.Time `json:"date_of_birth"`
-	Address     string    `json:"address"`
+	Address     string    `json:"address" validate:"required"`
 	PhoneNumber string    `json:"phone_number" validate:"max=11,min=10"`
 	Email       string    `json:"email" validate:"required"`
 }
@@ -73,6 +76,16 @@ func (Customer) ColumnCustomerId() string {
 }
 func (Customer) ColumnEmail() string {
 	return "email"
+}
+func (d *Customer) MarshalJSON() ([]byte, error) {
+	type Alias Customer
+	return json.Marshal(&struct {
+		*Alias
+		DateOfBirth string `json:"date_of_birth"`
+	}{
+		Alias:       (*Alias)(d),
+		DateOfBirth: d.DateOfBirth.Format("2006-01-02"),
+	})
 }
 
 type Employee struct {
@@ -300,10 +313,11 @@ func (ReceiptDetail) TableName() string {
 }
 
 type Cart struct {
-	CustomerId string  `json:"customer_id"`
-	ProductId  string  `json:"product_id"`
-	Amount     int     `json:"amount"`
-	Cost       float32 `json:"cost"`
+	CustomerId  string  `json:"customer_id"`
+	ProductId   string  `json:"product_id"`
+	Amount      int     `json:"amount"`
+	Cost        float32 `json:"cost"`
+	ProductInfo Product `json:"product_info" gorm:"references:ProductId;foreignKey:ProductId"`
 }
 
 func (Cart) TableName() string {

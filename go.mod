@@ -24,7 +24,11 @@ require (
 	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11
 )
 
-require github.com/klauspost/compress v1.16.0 // indirect
+require (
+	github.com/klauspost/compress v1.16.0 // indirect
+	github.com/logpacker/PayPal-Go-SDK v2.0.5+incompatible // indirect
+	github.com/plutov/paypal/v4 v4.7.0 // indirect
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect

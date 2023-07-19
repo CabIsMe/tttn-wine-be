@@ -15,7 +15,7 @@ type CustomerOrderService interface {
 	CreateCustomerOrderService(customerOrder models.CustomerOrder, customerOrderDetails []*models.CustomerOrderDetail) *internal.SystemStatus
 	AddProductsToCartService(cart models.Cart) *internal.SystemStatus
 	RemoveProductsToCartService(cart models.Cart) *internal.SystemStatus
-	AllProductsInCartService(customerId string) ([]models.Cart, *internal.SystemStatus)
+	AllProductsInCartService(customerId string) ([]*models.Cart, *internal.SystemStatus)
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -125,11 +125,13 @@ func (s *c_order_service) RemoveProductsToCartService(cart models.Cart) *interna
 	return nil
 }
 
-func (s *c_order_service) AllProductsInCartService(customerId string) ([]models.Cart, *internal.SystemStatus) {
+func (s *c_order_service) AllProductsInCartService(customerId string) ([]*models.Cart, *internal.SystemStatus) {
 	errResult := &internal.SystemStatus{
 		Status: internal.CODE_DB_FAILED,
 		Msg:    internal.MSG_DB_FAILED,
 	}
+	// listResults := make(map[string]interface{})
+
 	products, err := s.rp.GetAllProductsInCart(customerId)
 	if err != nil {
 		errResult.Detail = err.Error()
@@ -153,9 +155,11 @@ func (s *c_order_service) AllProductsInCartService(customerId string) ([]models.
 			}
 			model.Cost = product.Cost
 		}
+
 		return products, nil
 	}
 	for _, model := range products {
+		internal.Log.Info("Info products in cart", zap.Any("product", model))
 		promDetail, errProm := s.rp.GetPromotionDetail(model.ProductId, prom.PromotionId)
 		if errProm != nil {
 			errResult.Detail = errProm.Error()

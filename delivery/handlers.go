@@ -13,6 +13,7 @@ type Handlers interface {
 	AuthenticationHandler
 	PromotionHandler
 	CustomerOrderHandler
+	CustomerHandler
 }
 type handlers struct {
 	services.MainServices
@@ -20,6 +21,7 @@ type handlers struct {
 	AuthenticationHandler
 	PromotionHandler
 	CustomerOrderHandler
+	CustomerHandler
 }
 
 func NewHandlers(s services.MainServices) Handlers {
@@ -29,5 +31,6 @@ func NewHandlers(s services.MainServices) Handlers {
 		NewAuthenticationHandler(s),
 		NewPromotionHandler(s),
 		NewCustomerOrderHandler(s),
+		NewCustomerHandler(s),
 	}
 }

@@ -13,6 +13,7 @@ import (
 type CustomerRepository interface {
 	GetCustomer(empId string) (*models.Customer, error)
 	GetCustomerByEmail(email string) (*models.Customer, error)
+	UpdateCustomer(customer models.Customer) error
 }
 
 type customer_repos struct {
@@ -39,4 +40,15 @@ func (r *customer_repos) GetCustomerByEmail(email string) (*models.Customer, err
 		return nil, nil
 	}
 	return model, result
+}
+func (r *customer_repos) UpdateCustomer(customer models.Customer) error {
+	fmt.Println(customer)
+	err := internal.Db.Debug().Model(&models.Customer{}).
+		Where(fmt.Sprintf("%s = ?", customer.ColumnCustomerId()), customer.CustomerId).
+		Updates(customer)
+	if err.Error != nil {
+		return err.Error
+	}
+	internal.Log.Info("UpdateCustomer", zap.Any("Number of records", err.RowsAffected))
+	return nil
 }

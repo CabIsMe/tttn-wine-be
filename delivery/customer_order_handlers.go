@@ -15,6 +15,7 @@ type CustomerOrderHandler interface {
 	CreateCustomerOrder(ctx *fiber.Ctx) error
 	AddProductsToCartHandler(ctx *fiber.Ctx) error
 	RemoveProductsToCartHandler(ctx *fiber.Ctx) error
+	AllProductsInCartHandler(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -169,5 +170,30 @@ func (h *c_order_handler) RemoveProductsToCartHandler(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(models.Resp{
 		Status: 1,
 		Msg:    "OK",
+	})
+}
+func (h *c_order_handler) AllProductsInCartHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	customerId, ok := ctx.Locals("user_id").(string)
+	if !ok {
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	defer func() {
+		internal.Log.Info("AllProductsInCartService", zap.Any("uri", uri), zap.Any("auth", tokenAuth))
+	}()
+	listData, err := h.MainServices.CustomerOrderService.AllProductsInCartService(customerId)
+	if err != nil {
+		internal.Log.Error("AllProductsInCartService", zap.Any("Error", err))
+		return ctx.Status(http.StatusOK).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: listData,
 	})
 }

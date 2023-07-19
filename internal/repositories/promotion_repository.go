@@ -64,7 +64,7 @@ func (r *promotion_repos) GetPromotionDetail(productId string, promotionId strin
 
 func (r *promotion_repos) GetPromotionByDate() (*models.Promotion, error) {
 	model := &models.Promotion{}
-	result := internal.Db.Where(fmt.Sprintf("now() between %s and %s", model.DateStart, model.DateEnd)).
+	result := internal.Db.Where(fmt.Sprintf("now() between %s and %s", model.ColumnDateStart(), model.ColumnDateEnd())).
 		Take(&model).Error
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		internal.Log.Error("GetPromotionByDate", zap.Any("Error query", result))
