@@ -17,6 +17,7 @@ import (
 type ProductHandler interface {
 	AllProductsHandler(ctx *fiber.Ctx) error
 	NewReleaseProductsHandler(ctx *fiber.Ctx) error
+	TopSellingProductsHandler(ctx *fiber.Ctx) error
 	GetProductHandler(ctx *fiber.Ctx) error
 	GetProductByNameHandler(ctx *fiber.Ctx) error
 	PromotionalProductsHandler(ctx *fiber.Ctx) error
@@ -32,6 +33,17 @@ func NewProductHandler(s services.MainServices) ProductHandler {
 }
 func (h *product_handler) AllProductsHandler(ctx *fiber.Ctx) error {
 	results, err := h.s.AllProductsService()
+	if err != nil {
+		return ctx.Status(fiber.StatusOK).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: results,
+	})
+}
+func (h *product_handler) TopSellingProductsHandler(ctx *fiber.Ctx) error {
+	results, err := h.s.TopSellingProductsService()
 	if err != nil {
 		return ctx.Status(fiber.StatusOK).JSON(err)
 	}

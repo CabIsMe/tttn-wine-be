@@ -123,6 +123,22 @@ type Product struct {
 	CategoryInfo        *Category        `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
 	PromotionDetailInfo *PromotionDetail `gorm:"references:ProductId;foreignKey:ProductId" json:"promotion_detail_info"`
 }
+type ProductAndFrequency struct {
+	ProductId           string           `json:"product_id"`
+	ProductName         string           `json:"product_name"`
+	Cost                float32          `json:"cost"`
+	ProductImg          string           `json:"product_img"`
+	Description         string           `json:"description"`
+	InventoryNumber     int              `json:"inventory_number"`
+	Status              string           `json:"status"`
+	BrandId             string           `json:"-"`
+	CategoryId          string           `json:"-"`
+	IsNew               int8             `json:"is_new"`
+	BrandInfo           *Brand           `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
+	CategoryInfo        *Category        `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
+	PromotionDetailInfo *PromotionDetail `gorm:"references:ProductId;foreignKey:ProductId" json:"promotion_detail_info"`
+	Frequency           int              `json:"frequency"`
+}
 
 func (Product) TableName() string {
 	return "product"

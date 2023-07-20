@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
@@ -12,7 +13,7 @@ import (
 
 type ProductRepository interface {
 	GetAllProducts() ([]models.Product, error)
-	GetTheTopSellingProducts() ([]models.Product, error)
+	GetTopSellingProducts() ([]models.ProductAndFrequency, error)
 	GetNewReleaseProducts() ([]models.Product, error)
 	GetProduct(productId string) (*models.Product, error)
 	GetProductsByName(productName string) ([]models.Product, error)
@@ -38,13 +39,19 @@ func (r *product_repos) GetAllProducts() ([]models.Product, error) {
 	return products, err
 }
 
-func (r *product_repos) GetTheTopSellingProducts() ([]models.Product, error) {
-	var products []models.Product
-	var model models.Product
+func (r *product_repos) GetTopSellingProducts() ([]models.ProductAndFrequency, error) {
+	var products []models.ProductAndFrequency
+	// var model models.Product
 	err := internal.Db.Debug().
-		Select("product.*, brand.brand_name").
-		Table(model.TableName()).
-		Joins("JOIN brand ON product.brand_id = brand.brand_id").
+		Table("customer_order_detail").
+		Preload("BrandInfo").
+		Preload("CategoryInfo").
+		Select("product.*, COUNT(customer_order_detail.product_id) AS frequency").
+		Joins("INNER JOIN product ON customer_order_detail.product_id = product.product_id").
+		Where("customer_order_id IN (SELECT customer_order_id FROM customer_order WHERE t_delivery BETWEEN ? AND ? AND customer_order.status = 2 AND payment_status = 1)", time.Now().AddDate(0, 0, -30), time.Now()).
+		Group("customer_order_detail.product_id").
+		Order("frequency DESC").
+		Limit(5).
 		Find(&products)
 	return products, err.Error
 }
@@ -62,6 +69,7 @@ func (r *product_repos) GetNewReleaseProducts() ([]models.Product, error) {
 
 func (r *product_repos) GetProduct(productId string) (*models.Product, error) {
 	model := &models.Product{}
+
 	result := internal.Db.Where(fmt.Sprintf("%s = ?", model.ColumnProductId()), productId).
 		Preload("BrandInfo").
 		Preload("CategoryInfo").

@@ -57,6 +57,7 @@ var rootCmd = &cobra.Command{
 
 		// Client
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
+		AppServer.Get("/client/list-top-products", handlers.TopSellingProductsHandler)
 		AppServer.Get("/client/list-promotional-products", handlers.PromotionalProductsHandler)
 		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
 		AppServer.Post("/client/get-product", handlers.GetProductHandler)

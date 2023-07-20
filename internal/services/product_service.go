@@ -8,6 +8,7 @@ import (
 
 type ProductService interface {
 	AllProductsService() ([]models.Product, *internal.SystemStatus)
+	TopSellingProductsService() ([]models.ProductAndFrequency, *internal.SystemStatus)
 	NewReleaseProductsService() ([]models.Product, *internal.SystemStatus)
 	GetProductService(productId string) (*models.Product, *internal.SystemStatus)
 	GetProductsByNameService(productId string) ([]models.Product, *internal.SystemStatus)
@@ -25,6 +26,13 @@ func NewProductService(rp repositories.Repos) ProductService {
 
 func (s *product_service) AllProductsService() ([]models.Product, *internal.SystemStatus) {
 	listData, err := s.rp.GetAllProducts()
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return listData, nil
+}
+func (s *product_service) TopSellingProductsService() ([]models.ProductAndFrequency, *internal.SystemStatus) {
+	listData, err := s.rp.GetTopSellingProducts()
 	if err != nil {
 		return nil, internal.SysStatus.DbFailed
 	}
