@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -9,10 +10,12 @@ import (
 	"github.com/CabIsMe/tttn-wine-be/internal/repositories"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type CustomerOrderService interface {
 	CreateCustomerOrderService(customerOrder models.CustomerOrder, customerOrderDetails []*models.CustomerOrderDetail) *internal.SystemStatus
+	UpdateCustomerOrderService(customerOrder models.UpdatingCustomerOrder) *internal.SystemStatus
 	AddProductsToCartService(cart models.Cart) *internal.SystemStatus
 	RemoveProductsToCartService(cart models.Cart) *internal.SystemStatus
 	AllProductsInCartService(customerId string) ([]*models.Cart, *internal.SystemStatus)
@@ -66,6 +69,7 @@ func (s *c_order_service) CreateCustomerOrderService(
 
 	customerOrder.CustomerOrderId = customerOrderId
 	customerOrder.Status = models.Cos.UNAPPROVED.StatusCode
+	// customerOrder.TCreate = time.g
 	flag := -1
 	var inputCustomerOrders []*models.CustomerOrderDetail
 	for i := 0; i < len(customerOrderDetails); i++ {
@@ -89,6 +93,9 @@ func (s *c_order_service) CreateCustomerOrderService(
 	errCreate := s.rp.CreateCustomerOrder(customerOrder, inputCustomerOrders)
 	if errCreate != nil {
 		errResult.Detail = errCreate.Error()
+		if errors.Is(errCreate, gorm.ErrInvalidTransaction) {
+			errResult.Detail = "Sorry, the product you bought is out of stock"
+		}
 		return &errResult
 	}
 	return nil
@@ -187,4 +194,11 @@ func (s *c_order_service) AllProductsInCartService(customerId string) ([]*models
 		model.Cost = product.Cost * (1 - promDetail.DiscountPercentage)
 	}
 	return products, nil
+}
+func (s *c_order_service) UpdateCustomerOrderService(customerOrder models.UpdatingCustomerOrder) *internal.SystemStatus {
+	err := s.rp.UpdateCustomerOrder(customerOrder)
+	if err != nil {
+		return internal.SysStatus.DbFailed
+	}
+	return nil
 }

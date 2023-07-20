@@ -147,12 +147,21 @@ type CustomerOrder struct {
 	FullName                string                `json:"full_name"`
 	Address                 string                `json:"address" validate:"required"`
 	PhoneNumber             string                `json:"phone_number" validate:"max=11,min=10"`
-	TDelivery               time.Time             `json:"t_delivery" validate:"required"`
+	TDelivery               *time.Time            `json:"t_delivery"`
 	Status                  int8                  `json:"status" validate:"required"`
+	PaymentStatus           int8                  `json:"payment_status" validate:"required"`
 	EmployeeId              *string               `json:"employee_id"`
 	DelivererId             *string               `json:"deliverer_id"`
 	CustomerId              string                `json:"customer_id"`
 	CustomerOrderDetailInfo []CustomerOrderDetail `gorm:"foreignKey:CustomerOrderId;references:CustomerOrderId" json:"customer_order_detail_info"`
+}
+
+type UpdatingCustomerOrder struct {
+	CustomerOrderId string    `json:"customer_order_id"`
+	TDelivery       time.Time `json:"t_delivery"`
+	Status          int8      `json:"status"`
+	DelivererId     string    `json:"deliverer_id"`
+	EmployeeId      string    `json:"-"`
 }
 
 type CustomerOrderStatusObject struct {
@@ -164,6 +173,7 @@ type CustomerOrderStatusObject struct {
 
 func InitCustomerOrderStatusObject() *CustomerOrderStatusObject {
 	return &CustomerOrderStatusObject{
+
 		UNAPPROVED:        CustomerOrderStatus{1, "The order has not been approved."},
 		ORDER_CONFIRM:     CustomerOrderStatus{2, "Appoint delivery personnel"},
 		CHECK_OUT_SUCCESS: CustomerOrderStatus{3, "Check out success"},
@@ -316,7 +326,7 @@ type Cart struct {
 	CustomerId  string  `json:"customer_id"`
 	ProductId   string  `json:"product_id"`
 	Amount      int     `json:"amount"`
-	Cost        float32 `json:"cost"`
+	Cost        float32 `json:"cost" gorm:"<-:false"`
 	ProductInfo Product `json:"product_info" gorm:"references:ProductId;foreignKey:ProductId"`
 }
 

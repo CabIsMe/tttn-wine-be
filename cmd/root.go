@@ -53,6 +53,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/inside/employee-login", handlers.UserLoginHandler)
 		AppServer.Post("/inside/create-promotion", handlers.VerifyTokenInside, handlers.CreatePromotionHandler)
 		AppServer.Post("/inside/create-promotion-detail", handlers.VerifyTokenInside, handlers.CreatePromotionDetailHandler)
+		AppServer.Post("/inside/update-customer-order", handlers.VerifyTokenInside, handlers.UpdateCustomerOrderHandler)
 
 		// Client
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)

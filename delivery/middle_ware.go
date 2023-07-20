@@ -43,7 +43,7 @@ func (h *handlers) VerifyTokenClient(ctx *fiber.Ctx) error {
 }
 
 func (h *handlers) VerifyTokenInside(ctx *fiber.Ctx) error {
-	token := string(ctx.Request().Header.Peek("token"))
+	token := string(ctx.Request().Header.Peek("Authorization"))
 	internal.Log.Info("VerifyTokenInside", zap.Any("header", token))
 	if utils.IsEmpty(token) {
 		return ctx.Status(fiber.StatusOK).JSON(models.Resp{
