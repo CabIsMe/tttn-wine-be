@@ -42,7 +42,6 @@ func (r *customer_repos) GetCustomerByEmail(email string) (*models.Customer, err
 	return model, result
 }
 func (r *customer_repos) UpdateCustomer(customer models.Customer) error {
-	fmt.Println(customer)
 	err := internal.Db.Debug().Model(&models.Customer{}).
 		Where(fmt.Sprintf("%s = ?", customer.ColumnCustomerId()), customer.CustomerId).
 		Updates(customer)
