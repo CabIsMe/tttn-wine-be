@@ -36,7 +36,6 @@ var rootCmd = &cobra.Command{
 		AppServer.Use(cors.New(cors.Config{
 			AllowOrigins: "*",
 		}))
-
 		// TODO: Upload file
 		//Todo: APi portal call upload chưa gắn token
 
@@ -70,6 +69,8 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/cart", handlers.VerifyTokenClient, handlers.AllProductsInCartHandler)
 		AppServer.Get("/client/customer-info", handlers.VerifyTokenClient, handlers.GetCustomerInfoHandler)
 		AppServer.Post("/client/update-customer", handlers.VerifyTokenClient, handlers.UpdateCustomerHandler)
+		AppServer.Post("/client/payment/success", handlers.VerifyTokenClient, handlers.ResultPayment)
+		AppServer.Get("/client/get-payment", handlers.GetPaymentById)
 		if err := AppServer.Listen(":" + internal.Envs.ServicePort); err != nil {
 			fmt.Println("Fiber server got error ", err)
 		}
@@ -77,6 +78,8 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	os.Setenv("RAPYD_ACCESS_KEY", "rak_232FCC9417B6261038A9")
+	os.Setenv("RAPYD_SECRET_KEY", "rsk_cb8692a765a4372bf4101a68fd57e45f52f3148a07d5807ca892476be0e289a889347d9fb9014386")
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)

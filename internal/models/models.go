@@ -205,6 +205,9 @@ type CustomerOrderStatus struct {
 func (c *CustomerOrder) TableName() string {
 	return "customer_order"
 }
+func (c *CustomerOrder) ColumnCustomerOrderId() string {
+	return "customer_order_id"
+}
 
 type CustomerOrderDetail struct {
 	CustomerOrderDetailId string  `json:"customer_order_detail_id"`

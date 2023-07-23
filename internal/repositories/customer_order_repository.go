@@ -13,6 +13,7 @@ type CustomerOrderRepository interface {
 	CreateCustomerOrder(customerOrder models.CustomerOrder, listDetails []*models.CustomerOrderDetail) error
 	// confirm order, appoint employee for delivery, update time delivery
 	UpdateCustomerOrder(customerOrder models.UpdatingCustomerOrder) error
+	UpdatePaymentStatusCustomerOrder(id string, paymentStatus int8) error
 	AddProductsToCart(cart models.Cart) error
 	RemoveProductsToCart(cart models.Cart) error
 	GetAllProductsInCart(customerId string) ([]*models.Cart, error)
@@ -104,5 +105,16 @@ func (r *c_order_repos) UpdateCustomerOrder(customerOrder models.UpdatingCustome
 		return result.Error
 	}
 	internal.Log.Info("UpdateCustomerOrder", zap.Any("Number of records", result.RowsAffected))
+	return nil
+}
+
+func (r *c_order_repos) UpdatePaymentStatusCustomerOrder(id string, paymentStatus int8) error {
+	model := &models.CustomerOrder{}
+	res := internal.Db.Debug().Model(model).Where(fmt.Sprintf("%s = ?", model.ColumnCustomerOrderId()), id).
+		Update("payment_status", paymentStatus)
+	if res.Error != nil {
+		return res.Error
+	}
+	internal.Log.Info("UpdatePaymentStatusCustomerOrder", zap.Any("Number of records", res.RowsAffected))
 	return nil
 }

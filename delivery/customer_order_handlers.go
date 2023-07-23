@@ -2,12 +2,15 @@ package delivery
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
 	"github.com/CabIsMe/tttn-wine-be/internal/services"
 	"github.com/CabIsMe/tttn-wine-be/internal/utils"
 	"github.com/gofiber/fiber/v2"
+	paypal "github.com/logpacker/PayPal-Go-SDK"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 	"go.uber.org/zap"
 )
 
@@ -18,6 +21,8 @@ type CustomerOrderHandler interface {
 	RemoveProductsToCartHandler(ctx *fiber.Ctx) error
 	AllProductsInCartHandler(ctx *fiber.Ctx) error
 	UpdateCustomerOrderHandler(ctx *fiber.Ctx) error
+	ResultPayment(ctx *fiber.Ctx) error
+	GetPaymentById(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -28,6 +33,47 @@ func NewCustomerOrderHandler(s services.MainServices) CustomerOrderHandler {
 		s,
 	}
 }
+func (h *c_order_handler) GetPaymentById(ctx *fiber.Ctx) error {
+	c, _ := paypal.NewClient("Abx3-C9VHhLKmQPDxgYdnRV2WuoD_qabH0PojrQf5kv71GLi0uEcu6G4axzIGE5TL8oD5ZUx949A5IoR",
+		"EAemdpvcm6-ve8EaKo7v67BiRZ5rfVCxcSj0Gj5HVE5CEjU2-b2ZE9_RIaDgukntybIUiNfjKiox8-Ce", paypal.APIBaseSandBox)
+	c.SetLog(os.Stdout) // Set log to terminal stdout
+
+	// accessToken, err := c.GetAccessToken()
+	order, _ := c.GetOrder("O-4J082351X3132253H")
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: order,
+	})
+}
+
+func (h *c_order_handler) ResultPayment(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("ResultPayment", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	var requestBody map[string]string
+	if err := ctx.BodyParser(&requestBody); err != nil {
+		return ctx.Status(200).JSON(resultError)
+	}
+	orderId := requestBody["order_id"]
+	err := h.MainServices.CustomerOrderService.UpdatePaymentStatusCustomerOrderService(orderId)
+	if err != nil {
+		return ctx.Status(200).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+	})
+}
+
 func (h *c_order_handler) CreateCustomerOrder(ctx *fiber.Ctx) error {
 	resultError := models.Resp{
 		Status: internal.CODE_WRONG_PARAMS,
@@ -64,15 +110,17 @@ func (h *c_order_handler) CreateCustomerOrder(ctx *fiber.Ctx) error {
 		resultError.Detail = utils.ShowErrors(errs)
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
+	customerOrderId, _ := gonanoid.New()
 
 	inputData := models.CustomerOrder{
-		FullName:      payload.FullName,
-		TCreate:       utils.GetTimeUTC7(),
-		Address:       payload.Address,
-		PhoneNumber:   payload.PhoneNumber,
-		CustomerId:    customerId,
-		PaymentStatus: payload.PaymentStatus,
-		TDelivery:     nil,
+		CustomerOrderId: customerOrderId,
+		FullName:        payload.FullName,
+		TCreate:         utils.GetTimeUTC7(),
+		Address:         payload.Address,
+		PhoneNumber:     payload.PhoneNumber,
+		CustomerId:      customerId,
+		PaymentStatus:   payload.PaymentStatus,
+		TDelivery:       nil,
 	}
 
 	internal.Log.Info("CreateCustomerOrder", zap.Any("InputData", inputData))

@@ -19,6 +19,7 @@ type CustomerOrderService interface {
 	AddProductsToCartService(cart models.Cart) *internal.SystemStatus
 	RemoveProductsToCartService(cart models.Cart) *internal.SystemStatus
 	AllProductsInCartService(customerId string) ([]*models.Cart, *internal.SystemStatus)
+	UpdatePaymentStatusCustomerOrderService(customerOrderId string) *internal.SystemStatus
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -65,9 +66,7 @@ func (s *c_order_service) CreateCustomerOrderService(
 		errResult.Detail = "Customer not found"
 		return &errResult
 	}
-	customerOrderId, _ := gonanoid.New()
 
-	customerOrder.CustomerOrderId = customerOrderId
 	customerOrder.Status = models.Cos.UNAPPROVED.StatusCode
 	// customerOrder.TCreate = time.g
 	flag := -1
@@ -197,6 +196,14 @@ func (s *c_order_service) AllProductsInCartService(customerId string) ([]*models
 }
 func (s *c_order_service) UpdateCustomerOrderService(customerOrder models.UpdatingCustomerOrder) *internal.SystemStatus {
 	err := s.rp.UpdateCustomerOrder(customerOrder)
+	if err != nil {
+		return internal.SysStatus.DbFailed
+	}
+	return nil
+}
+
+func (s *c_order_service) UpdatePaymentStatusCustomerOrderService(customerOrderId string) *internal.SystemStatus {
+	err := s.rp.UpdatePaymentStatusCustomerOrder(customerOrderId, 2)
 	if err != nil {
 		return internal.SysStatus.DbFailed
 	}
