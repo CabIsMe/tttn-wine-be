@@ -16,6 +16,7 @@ import (
 
 // CLIENT_ID : Abx3-C9VHhLKmQPDxgYdnRV2WuoD_qabH0PojrQf5kv71GLi0uEcu6G4axzIGE5TL8oD5ZUx949A5IoR
 type CustomerOrderHandler interface {
+	AllCustomerOrdersHandler(ctx *fiber.Ctx) error
 	CreateCustomerOrder(ctx *fiber.Ctx) error
 	AddProductsToCartHandler(ctx *fiber.Ctx) error
 	RemoveProductsToCartHandler(ctx *fiber.Ctx) error
@@ -296,4 +297,22 @@ func (h *c_order_handler) UpdateCustomerOrderHandler(ctx *fiber.Ctx) error {
 		Detail: payload,
 	})
 
+}
+
+func (h *c_order_handler) AllCustomerOrdersHandler(ctx *fiber.Ctx) error {
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("Authorization"))
+	defer func() {
+		internal.Log.Info("AllCustomerOrdersHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth))
+	}()
+	listData, err := h.MainServices.CustomerOrderService.AllCustomerOrdersService()
+	if err != nil {
+		internal.Log.Error("AllCustomerOrdersHandler", zap.Any("Error", err))
+		return ctx.Status(http.StatusOK).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: listData,
+	})
 }

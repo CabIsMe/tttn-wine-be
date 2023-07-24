@@ -5,11 +5,13 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/CabIsMe/tttn-wine-be/delivery"
 	"github.com/CabIsMe/tttn-wine-be/internal"
+	"github.com/CabIsMe/tttn-wine-be/internal/models"
 	"github.com/CabIsMe/tttn-wine-be/internal/repositories"
 	"github.com/CabIsMe/tttn-wine-be/internal/services"
 	"github.com/go-co-op/gocron"
@@ -53,6 +55,10 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/inside/create-promotion", handlers.VerifyTokenInside, handlers.CreatePromotionHandler)
 		AppServer.Post("/inside/create-promotion-detail", handlers.VerifyTokenInside, handlers.CreatePromotionDetailHandler)
 		AppServer.Post("/inside/update-customer-order", handlers.VerifyTokenInside, handlers.UpdateCustomerOrderHandler)
+		AppServer.Get("/inside/list-customer-orders", handlers.VerifyTokenInside, handlers.AllCustomerOrdersHandler)
+		AppServer.Get("/inside/list-status-customer-orders", handlers.VerifyTokenInside, func(ctx *fiber.Ctx) error {
+			return ctx.Status(http.StatusOK).JSON(models.Cos)
+		})
 
 		// Client
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
