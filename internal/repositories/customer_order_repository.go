@@ -17,6 +17,7 @@ type CustomerOrderRepository interface {
 	AddProductsToCart(cart models.Cart) error
 	RemoveProductsToCart(cart models.Cart) error
 	GetAllProductsInCart(customerId string) ([]*models.Cart, error)
+	GetAllCustomerOrders() ([]models.CustomerOrder, error)
 }
 
 type c_order_repos struct {
@@ -117,4 +118,13 @@ func (r *c_order_repos) UpdatePaymentStatusCustomerOrder(id string, paymentStatu
 	}
 	internal.Log.Info("UpdatePaymentStatusCustomerOrder", zap.Any("Number of records", res.RowsAffected))
 	return nil
+}
+
+func (r *c_order_repos) GetAllCustomerOrders() ([]models.CustomerOrder, error) {
+	var listResults []models.CustomerOrder
+	err := internal.Db.Debug().Find(&listResults).Error
+	if err != nil {
+		return nil, err
+	}
+	return listResults, nil
 }

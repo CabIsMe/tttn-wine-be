@@ -172,6 +172,19 @@ type CustomerOrder struct {
 	CustomerOrderDetailInfo []CustomerOrderDetail `gorm:"foreignKey:CustomerOrderId;references:CustomerOrderId" json:"customer_order_detail_info"`
 }
 
+func (d *CustomerOrder) MarshalJSON() ([]byte, error) {
+	type Alias CustomerOrder
+	return json.Marshal(&struct {
+		*Alias
+		TCreate   string `json:"t_create"`
+		TDelivery string `json:"t_delivery"`
+	}{
+		Alias:     (*Alias)(d),
+		TCreate:   d.TCreate.Format("2006-01-02"),
+		TDelivery: d.TDelivery.Format("2006-01-02"),
+	})
+}
+
 type UpdatingCustomerOrder struct {
 	CustomerOrderId string    `json:"customer_order_id"`
 	TDelivery       time.Time `json:"t_delivery"`
@@ -189,7 +202,6 @@ type CustomerOrderStatusObject struct {
 
 func InitCustomerOrderStatusObject() *CustomerOrderStatusObject {
 	return &CustomerOrderStatusObject{
-
 		UNAPPROVED:        CustomerOrderStatus{1, "The order has not been approved."},
 		ORDER_CONFIRM:     CustomerOrderStatus{2, "Appoint delivery personnel"},
 		CHECK_OUT_SUCCESS: CustomerOrderStatus{3, "Check out success"},
