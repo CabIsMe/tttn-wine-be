@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -23,6 +24,7 @@ type CustomerOrderHandler interface {
 	UpdateCustomerOrderHandler(ctx *fiber.Ctx) error
 	ResultPayment(ctx *fiber.Ctx) error
 	GetPaymentById(ctx *fiber.Ctx) error
+	PaymentSuccess(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -33,13 +35,24 @@ func NewCustomerOrderHandler(s services.MainServices) CustomerOrderHandler {
 		s,
 	}
 }
+
+func (h *c_order_handler) PaymentSuccess(c *fiber.Ctx) error {
+	paymentId := c.Query("paymentId")
+	payerId := c.Query("PayerID")
+	token := c.Query("token")
+	fmt.Println(paymentId)
+	fmt.Println(payerId)
+	fmt.Println(token)
+	return c.SendString("success")
+}
+
 func (h *c_order_handler) GetPaymentById(ctx *fiber.Ctx) error {
 	c, _ := paypal.NewClient("Abx3-C9VHhLKmQPDxgYdnRV2WuoD_qabH0PojrQf5kv71GLi0uEcu6G4axzIGE5TL8oD5ZUx949A5IoR",
 		"EAemdpvcm6-ve8EaKo7v67BiRZ5rfVCxcSj0Gj5HVE5CEjU2-b2ZE9_RIaDgukntybIUiNfjKiox8-Ce", paypal.APIBaseSandBox)
 	c.SetLog(os.Stdout) // Set log to terminal stdout
 
 	// accessToken, err := c.GetAccessToken()
-	order, _ := c.GetOrder("O-4J082351X3132253H")
+	order, _ := c.GetOrder("PAYID-MS6UYLY5B214533YG293490N")
 	return ctx.Status(http.StatusOK).JSON(models.Resp{
 		Status: 1,
 		Msg:    "OK",
