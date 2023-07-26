@@ -76,7 +76,6 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/customer-info", handlers.VerifyTokenClient, handlers.GetCustomerInfoHandler)
 		AppServer.Post("/client/update-customer", handlers.VerifyTokenClient, handlers.UpdateCustomerHandler)
 		AppServer.Post("/client/payment/success", handlers.VerifyTokenClient, handlers.ResultPayment)
-		AppServer.Get("/pay/success", handlers.PaymentSuccess)
 		if err := AppServer.Listen(":" + internal.Envs.ServicePort); err != nil {
 			fmt.Println("Fiber server got error ", err)
 		}

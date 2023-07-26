@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
@@ -22,7 +21,6 @@ type CustomerOrderHandler interface {
 	AllProductsInCartHandler(ctx *fiber.Ctx) error
 	UpdateCustomerOrderHandler(ctx *fiber.Ctx) error
 	ResultPayment(ctx *fiber.Ctx) error
-	PaymentSuccess(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -34,15 +32,15 @@ func NewCustomerOrderHandler(s services.MainServices) CustomerOrderHandler {
 	}
 }
 
-func (h *c_order_handler) PaymentSuccess(c *fiber.Ctx) error {
-	paymentId := c.Query("paymentId")
-	payerId := c.Query("PayerID")
-	token := c.Query("token")
-	fmt.Println(paymentId)
-	fmt.Println(payerId)
-	fmt.Println(token)
-	return c.SendString("success")
-}
+// func (h *c_order_handler) PaymentSuccess(c *fiber.Ctx) error {
+// 	paymentId := c.Query("paymentId")
+// 	payerId := c.Query("PayerID")
+// 	token := c.Query("token")
+// 	fmt.Println(paymentId)
+// 	fmt.Println(payerId)
+// 	fmt.Println(token)
+// 	return c.SendString("success")
+// }
 
 func (h *c_order_handler) ResultPayment(ctx *fiber.Ctx) error {
 	resultError := models.Resp{
