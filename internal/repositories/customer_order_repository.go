@@ -121,10 +121,8 @@ func (r *c_order_repos) UpdatePaymentStatusCustomerOrder(id string, paymentStatu
 }
 
 func (r *c_order_repos) GetAllCustomerOrders() ([]models.CustomerOrder, error) {
-	var listResults []models.CustomerOrder
-	err := internal.Db.Debug().Find(&listResults).Error
-	if err != nil {
-		return nil, err
-	}
-	return listResults, nil
+	var customerOrder []models.CustomerOrder
+	err := internal.Db.Debug().
+		Find(&customerOrder).Error
+	return customerOrder, err
 }

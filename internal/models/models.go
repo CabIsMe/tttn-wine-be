@@ -172,6 +172,13 @@ type CustomerOrder struct {
 	CustomerOrderDetailInfo []CustomerOrderDetail `gorm:"foreignKey:CustomerOrderId;references:CustomerOrderId" json:"customer_order_detail_info"`
 }
 
+func (CustomerOrder) TableName() string {
+	return "customer_order"
+}
+func (CustomerOrder) ColumnCustomerOrderId() string {
+	return "customer_order_id"
+}
+
 func (d *CustomerOrder) MarshalJSON() ([]byte, error) {
 	type Alias CustomerOrder
 	return json.Marshal(&struct {
@@ -212,13 +219,6 @@ func InitCustomerOrderStatusObject() *CustomerOrderStatusObject {
 type CustomerOrderStatus struct {
 	StatusCode int8
 	StatusDesc string
-}
-
-func (c *CustomerOrder) TableName() string {
-	return "customer_order"
-}
-func (c *CustomerOrder) ColumnCustomerOrderId() string {
-	return "customer_order_id"
 }
 
 type CustomerOrderDetail struct {

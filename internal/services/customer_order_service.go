@@ -20,7 +20,7 @@ type CustomerOrderService interface {
 	RemoveProductsToCartService(cart models.Cart) *internal.SystemStatus
 	AllProductsInCartService(customerId string) ([]*models.Cart, *internal.SystemStatus)
 	UpdatePaymentStatusCustomerOrderService(customerOrderId string) *internal.SystemStatus
-	AllCustomerOrdersService() ([]models.CustomerOrder, *internal.SystemStatus)
+	AllCustomerOrdersService() (interface{}, *internal.SystemStatus)
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -211,10 +211,12 @@ func (s *c_order_service) UpdatePaymentStatusCustomerOrderService(customerOrderI
 	return nil
 }
 
-func (s *c_order_service) AllCustomerOrdersService() ([]models.CustomerOrder, *internal.SystemStatus) {
+func (s *c_order_service) AllCustomerOrdersService() (interface{}, *internal.SystemStatus) {
 	listResults, err := s.rp.GetAllCustomerOrders()
 	if err != nil {
+		internal.Log.Error("AllCustomerOrdersService", zap.Any("err", err.Error()))
 		return nil, internal.SysStatus.DbFailed
 	}
+	internal.Log.Info("AllCustomerOrdersService", zap.Any("listResults", listResults))
 	return listResults, nil
 }
