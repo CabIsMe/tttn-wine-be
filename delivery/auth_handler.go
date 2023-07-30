@@ -15,6 +15,7 @@ import (
 type AuthenticationHandler interface {
 	SignUpUserHandler(c *fiber.Ctx) error
 	UserLoginHandler(ctx *fiber.Ctx) error
+	GetAccountInfoHandler(ctx *fiber.Ctx) error
 }
 type auth_handler struct {
 	services.MainServices
@@ -95,4 +96,23 @@ func (h *auth_handler) UserLoginHandler(ctx *fiber.Ctx) error {
 			"refresh_token": refreshToken,
 		},
 	})
+}
+
+func (h *auth_handler) GetAccountInfoHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	employeeId, ok := ctx.Locals("user_id").(string)
+	if !ok {
+		internal.Log.Error("employeeId, ok", zap.Any("Error", ok))
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	defer func() {
+		internal.Log.Info("CreatePromotionHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("employeeId", employeeId))
+	}()
+	resultData := h.MainServices.AccountService.GetAccountInfoService(employeeId)
+	return ctx.Status(http.StatusOK).JSON(resultData)
 }

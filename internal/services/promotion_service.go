@@ -10,6 +10,7 @@ import (
 type PromotionService interface {
 	CreatePromotionService(model models.Promotion) *internal.SystemStatus
 	CreatePromotionDetailService(model models.PromotionDetail) *internal.SystemStatus
+	GetPromotionByDateService() (*models.PromotionAndPercent, *internal.SystemStatus)
 }
 type promotion_service struct {
 	rp repositories.Repos
@@ -64,4 +65,11 @@ func (s *promotion_service) CreatePromotionDetailService(modelInput models.Promo
 		return &errResult
 	}
 	return nil
+}
+func (s *promotion_service) GetPromotionByDateService() (*models.PromotionAndPercent, *internal.SystemStatus) {
+	prom, err := s.rp.GetPromotionByDate()
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return prom, nil
 }

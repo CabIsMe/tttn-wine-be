@@ -15,6 +15,8 @@ import (
 type PromotionHandler interface {
 	CreatePromotionHandler(ctx *fiber.Ctx) error
 	CreatePromotionDetailHandler(ctx *fiber.Ctx) error
+	//TODO: get promotion by date and max(discount)
+	GetPromotionByDateHandler(ctx *fiber.Ctx) error
 }
 type promotion_handler struct {
 	services.MainServices
@@ -126,5 +128,29 @@ func (h *promotion_handler) CreatePromotionDetailHandler(ctx *fiber.Ctx) error {
 		Status: 1,
 		Msg:    "OK",
 		Detail: payload,
+	})
+}
+
+func (h *promotion_handler) GetPromotionByDateHandler(ctx *fiber.Ctx) error {
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("CreatePromotionDetailHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth))
+	}()
+	model, err := h.MainServices.PromotionService.GetPromotionByDateService()
+	if err != nil {
+		return ctx.Status(http.StatusOK).JSON(err)
+	}
+	if model == nil {
+		return ctx.Status(http.StatusOK).JSON(models.Resp{
+			Status: 1,
+			Msg:    "OK",
+			Detail: nil,
+		})
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: model,
 	})
 }

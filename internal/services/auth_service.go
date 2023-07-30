@@ -97,7 +97,7 @@ func (s *auth_service) UserLoginService(model models.Account) (interface{}, inte
 			}
 		}
 		internal.Log.Info("Login in with Employee")
-		accessToken, err2 = generateUserToken(user.Username, employee.EmployeeId, user.RoleId, 24, internal.Keys.INSIDE_ACCESS_TOKEN_SECRET)
+		accessToken, err2 = generateUserToken(user.Username, employee.EmployeeId, user.RoleId, 100*24, internal.Keys.INSIDE_ACCESS_TOKEN_SECRET)
 		refreshToken, err3 = generateUserToken(user.Username, employee.EmployeeId, -1, 24*15, internal.Keys.INSIDE_REFRESH_TOKEN_SECRET)
 	}
 	if err2 != nil || err3 != nil {

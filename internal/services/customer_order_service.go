@@ -20,7 +20,10 @@ type CustomerOrderService interface {
 	RemoveProductsToCartService(cart models.Cart) *internal.SystemStatus
 	AllProductsInCartService(customerId string) ([]*models.Cart, *internal.SystemStatus)
 	UpdatePaymentStatusCustomerOrderService(customerOrderId string) *internal.SystemStatus
+	UpdateStatusCustomerOrderService(customerOrderId string, stt int8) *internal.SystemStatus
 	AllCustomerOrdersService() (interface{}, *internal.SystemStatus)
+	AllCustomerOrdersByStatusService(listStt []int8) (interface{}, *internal.SystemStatus)
+	AllDelivererIdsService() ([]models.Employee, *internal.SystemStatus)
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -196,7 +199,11 @@ func (s *c_order_service) AllProductsInCartService(customerId string) ([]*models
 	return products, nil
 }
 func (s *c_order_service) UpdateCustomerOrderService(customerOrder models.UpdatingCustomerOrder) *internal.SystemStatus {
-	err := s.rp.UpdateCustomerOrder(customerOrder)
+	deliverer, err := s.rp.GetEmployee(customerOrder.DelivererId)
+	if deliverer == nil || err != nil {
+		return internal.SysStatus.DbFailed
+	}
+	err = s.rp.UpdateCustomerOrder(customerOrder)
 	if err != nil {
 		return internal.SysStatus.DbFailed
 	}
@@ -210,6 +217,13 @@ func (s *c_order_service) UpdatePaymentStatusCustomerOrderService(customerOrderI
 	}
 	return nil
 }
+func (s *c_order_service) UpdateStatusCustomerOrderService(customerOrderId string, stt int8) *internal.SystemStatus {
+	err := s.rp.UpdateStatusCustomerOrder(customerOrderId, stt)
+	if err != nil {
+		return internal.SysStatus.DbFailed
+	}
+	return nil
+}
 
 func (s *c_order_service) AllCustomerOrdersService() (interface{}, *internal.SystemStatus) {
 	listResults, err := s.rp.GetAllCustomerOrders()
@@ -218,5 +232,24 @@ func (s *c_order_service) AllCustomerOrdersService() (interface{}, *internal.Sys
 		return nil, internal.SysStatus.DbFailed
 	}
 	internal.Log.Info("AllCustomerOrdersService", zap.Any("listResults", listResults))
+	return listResults, nil
+}
+func (s *c_order_service) AllCustomerOrdersByStatusService(listStt []int8) (interface{}, *internal.SystemStatus) {
+	listResults, err := s.rp.GetAllCustomerOrdersByStatus(listStt)
+	if err != nil {
+		internal.Log.Error("AllCustomerOrdersByStatusService", zap.Any("err", err.Error()))
+		return nil, internal.SysStatus.DbFailed
+	}
+	internal.Log.Info("AllCustomerOrdersByStatusService", zap.Any("listResults", listResults))
+	return listResults, nil
+}
+
+func (s *c_order_service) AllDelivererIdsService() ([]models.Employee, *internal.SystemStatus) {
+	listResults, err := s.rp.GetAllDeliverers()
+	if err != nil {
+		internal.Log.Error("AllDelivererIdsService", zap.Any("err", err.Error()))
+		return nil, internal.SysStatus.DbFailed
+	}
+	internal.Log.Info("AllDelivererIdsService", zap.Any("listResults", listResults))
 	return listResults, nil
 }

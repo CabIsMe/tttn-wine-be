@@ -15,12 +15,15 @@ import (
 // CLIENT_ID : Abx3-C9VHhLKmQPDxgYdnRV2WuoD_qabH0PojrQf5kv71GLi0uEcu6G4axzIGE5TL8oD5ZUx949A5IoR
 type CustomerOrderHandler interface {
 	AllCustomerOrdersHandler(ctx *fiber.Ctx) error
+	AllCustomerOrdersByStatusHandler(ctx *fiber.Ctx) error
 	CreateCustomerOrder(ctx *fiber.Ctx) error
 	AddProductsToCartHandler(ctx *fiber.Ctx) error
 	RemoveProductsToCartHandler(ctx *fiber.Ctx) error
 	AllProductsInCartHandler(ctx *fiber.Ctx) error
 	UpdateCustomerOrderHandler(ctx *fiber.Ctx) error
-	ResultPayment(ctx *fiber.Ctx) error
+	UpdateStatusCustomerOrderHandler(ctx *fiber.Ctx) error
+	AllDeliverersHandler(ctx *fiber.Ctx) error
+	UpdatePaymentStatusHandler(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -42,7 +45,7 @@ func NewCustomerOrderHandler(s services.MainServices) CustomerOrderHandler {
 // 	return c.SendString("success")
 // }
 
-func (h *c_order_handler) ResultPayment(ctx *fiber.Ctx) error {
+func (h *c_order_handler) UpdatePaymentStatusHandler(ctx *fiber.Ctx) error {
 	resultError := models.Resp{
 		Status: internal.CODE_WRONG_PARAMS,
 		Msg:    internal.MSG_WRONG_PARAMS,
@@ -52,7 +55,7 @@ func (h *c_order_handler) ResultPayment(ctx *fiber.Ctx) error {
 	uri := string(ctx.Request().URI().RequestURI())
 	tokenAuth := string(ctx.Request().Header.Peek("token"))
 	defer func() {
-		internal.Log.Info("ResultPayment", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+		internal.Log.Info("UpdatePaymentStatusHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
 	}()
 	var requestBody map[string]string
 	if err := ctx.BodyParser(&requestBody); err != nil {
@@ -60,6 +63,43 @@ func (h *c_order_handler) ResultPayment(ctx *fiber.Ctx) error {
 	}
 	orderId := requestBody["order_id"]
 	err := h.MainServices.CustomerOrderService.UpdatePaymentStatusCustomerOrderService(orderId)
+	if err != nil {
+		return ctx.Status(200).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+	})
+}
+
+func (h *c_order_handler) UpdateStatusCustomerOrderHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("UpdateStatusCustomerOrderHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+
+	payload := &struct {
+		CustomerOrderId string `json:"customer_order_id" validate:"required"`
+		Status          int8   `json:"status" validate:"required"`
+	}{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		resultError.Detail = err.Error()
+		return ctx.Status(200).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	err := h.MainServices.CustomerOrderService.UpdateStatusCustomerOrderService(payload.CustomerOrderId, payload.Status)
 	if err != nil {
 		return ctx.Status(200).JSON(err)
 	}
@@ -274,6 +314,7 @@ func (h *c_order_handler) UpdateCustomerOrderHandler(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 
+	// CONFIRM ORDER
 	inputData := models.UpdatingCustomerOrder{
 		CustomerOrderId: payload.CustomerOrderId,
 		TDelivery:       dateDelivery,
@@ -302,6 +343,59 @@ func (h *c_order_handler) AllCustomerOrdersHandler(ctx *fiber.Ctx) error {
 	listData, err := h.MainServices.CustomerOrderService.AllCustomerOrdersService()
 	if err != nil {
 		internal.Log.Error("AllCustomerOrdersHandler", zap.Any("Error", err))
+		return ctx.Status(http.StatusOK).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: listData,
+	})
+}
+func (h *c_order_handler) AllCustomerOrdersByStatusHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("Authorization"))
+	var body interface{}
+	ctx.BodyParser(&body)
+	defer func() {
+		internal.Log.Info("AllCustomerOrdersByStatusHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+
+	payload := &struct {
+		ListStatus []int8 `json:"list_status"`
+	}{}
+
+	if err := ctx.BodyParser(&payload); err != nil {
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	if len(payload.ListStatus) < 1 {
+		resultError.Detail = "List Status is empty"
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	listData, err := h.MainServices.CustomerOrderService.AllCustomerOrdersByStatusService(payload.ListStatus)
+	if err != nil {
+		internal.Log.Error("AllCustomerOrdersByStatusHandler", zap.Any("Error", err))
+		return ctx.Status(http.StatusOK).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: listData,
+	})
+}
+
+func (h *c_order_handler) AllDeliverersHandler(ctx *fiber.Ctx) error {
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("Authorization"))
+	defer func() {
+		internal.Log.Info("AllDeliverersHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth))
+	}()
+	listData, err := h.MainServices.CustomerOrderService.AllDelivererIdsService()
+	if err != nil {
+		internal.Log.Error("AllDeliverersHandler", zap.Any("Error", err))
 		return ctx.Status(http.StatusOK).JSON(err)
 	}
 	return ctx.Status(http.StatusOK).JSON(models.Resp{

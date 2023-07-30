@@ -7,6 +7,7 @@ import (
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
 	"github.com/CabIsMe/tttn-wine-be/internal/models"
+	"github.com/CabIsMe/tttn-wine-be/internal/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -15,7 +16,7 @@ type PromotionRepository interface {
 	CreatePromotion(model models.Promotion) error
 	CheckLogicalPromotionDate(dateInput time.Time) (bool, error)
 	GetAllPromotions() ([]models.Promotion, error)
-	GetPromotionByDate() (*models.Promotion, error)
+	GetPromotionByDate() (*models.PromotionAndPercent, error)
 	GetPromotionDetail(productId string, promotionId string) (*models.PromotionDetail, error)
 	CreatePromotionDetail(model models.PromotionDetail) error
 }
@@ -62,10 +63,15 @@ func (r *promotion_repos) GetPromotionDetail(productId string, promotionId strin
 	return model, result
 }
 
-func (r *promotion_repos) GetPromotionByDate() (*models.Promotion, error) {
-	model := &models.Promotion{}
-	result := internal.Db.Where(fmt.Sprintf("now() between %s and %s", model.ColumnDateStart(), model.ColumnDateEnd())).
-		Take(&model).Error
+func (r *promotion_repos) GetPromotionByDate() (*models.PromotionAndPercent, error) {
+	model := &models.PromotionAndPercent{}
+	now := utils.GetTimeUTC7()
+	result := internal.Db.Select("promotion.*, promotion_detail.discount_percentage").
+		Table("promotion").
+		Joins("INNER JOIN promotion_detail ON promotion.promotion_id = promotion_detail.promotion_id").
+		Where("promotion.date_start <= ? AND promotion.date_end >= ?", now, now).
+		Order("promotion_detail.discount_percentage DESC").
+		First(model).Error
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		internal.Log.Error("GetPromotionByDate", zap.Any("Error query", result))
 		return nil, nil

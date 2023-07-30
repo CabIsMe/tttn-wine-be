@@ -46,9 +46,9 @@ func (r *product_repos) GetTopSellingProducts() ([]models.ProductAndFrequency, e
 		Table("customer_order_detail").
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
-		Select("product.*, COUNT(customer_order_detail.product_id) AS frequency").
+		Select("product.*, SUM(customer_order_detail.product_id) AS frequency").
 		Joins("INNER JOIN product ON customer_order_detail.product_id = product.product_id").
-		Where("customer_order_id IN (SELECT customer_order_id FROM customer_order WHERE t_delivery BETWEEN ? AND ? AND customer_order.status = 2 AND payment_status = 1)", time.Now().AddDate(0, 0, -30), time.Now()).
+		Where("customer_order_id IN (SELECT customer_order_id FROM customer_order WHERE t_delivery BETWEEN ? AND ? AND customer_order.status = 3 AND payment_status = 2)", time.Now().AddDate(0, 0, -30), time.Now()).
 		Group("customer_order_detail.product_id").
 		Order("frequency DESC").
 		Limit(5).

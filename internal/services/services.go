@@ -9,6 +9,7 @@ type MainServices struct {
 	PromotionService
 	CustomerOrderService
 	CustomerService
+	AccountService
 }
 
 func NewServices(rp repositories.Repos) MainServices {
@@ -19,5 +20,6 @@ func NewServices(rp repositories.Repos) MainServices {
 		NewPromotionService(rp),
 		NewCustomerOrderService(rp),
 		NewCustomerService(rp),
+		NewAccountService(rp),
 	}
 }

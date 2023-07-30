@@ -55,7 +55,11 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/inside/create-promotion", handlers.VerifyTokenInside, handlers.CreatePromotionHandler)
 		AppServer.Post("/inside/create-promotion-detail", handlers.VerifyTokenInside, handlers.CreatePromotionDetailHandler)
 		AppServer.Post("/inside/update-customer-order", handlers.VerifyTokenInside, handlers.UpdateCustomerOrderHandler)
+		AppServer.Post("/inside/update-status-customer-order", handlers.VerifyTokenInside, handlers.UpdateStatusCustomerOrderHandler)
 		AppServer.Get("/inside/list-customer-orders", handlers.VerifyTokenInside, handlers.AllCustomerOrdersHandler)
+		AppServer.Post("/inside/list-customer-orders-by-status", handlers.VerifyTokenInside, handlers.AllCustomerOrdersByStatusHandler)
+		AppServer.Get("/inside/user-info", handlers.VerifyTokenInside, handlers.GetAccountInfoHandler)
+		AppServer.Get("/inside/list-deliverers", handlers.VerifyTokenInside, handlers.AllDeliverersHandler)
 		AppServer.Get("/inside/list-status-customer-orders", handlers.VerifyTokenInside, func(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusOK).JSON(models.Cos)
 		})
@@ -64,6 +68,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
 		AppServer.Get("/client/list-top-products", handlers.TopSellingProductsHandler)
 		AppServer.Get("/client/list-promotional-products", handlers.PromotionalProductsHandler)
+		AppServer.Get("/client/get-promotion-by-date", handlers.GetPromotionByDateHandler)
 		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
 		AppServer.Post("/client/get-product", handlers.GetProductHandler)
 		AppServer.Post("/client/get-product-by-name", handlers.GetProductByNameHandler)
@@ -75,7 +80,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/cart", handlers.VerifyTokenClient, handlers.AllProductsInCartHandler)
 		AppServer.Get("/client/customer-info", handlers.VerifyTokenClient, handlers.GetCustomerInfoHandler)
 		AppServer.Post("/client/update-customer", handlers.VerifyTokenClient, handlers.UpdateCustomerHandler)
-		AppServer.Post("/client/payment/success", handlers.VerifyTokenClient, handlers.ResultPayment)
+		AppServer.Post("/client/payment/success", handlers.VerifyTokenClient, handlers.UpdatePaymentStatusHandler)
 		if err := AppServer.Listen(":" + internal.Envs.ServicePort); err != nil {
 			fmt.Println("Fiber server got error ", err)
 		}

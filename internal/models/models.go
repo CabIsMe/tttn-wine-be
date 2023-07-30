@@ -37,6 +37,12 @@ type Account struct {
 	Username     string `json:"username" validate:"required,email"`
 	UserPassword string `gorm:"user_password" json:"password" validate:"required"`
 	RoleId       int8   `json:"-"`
+	RoleInfo     Role   `gorm:"references:RoleId;foreignKey:RoleId" json:"role_info"`
+}
+type AccountInfo struct {
+	Username string `json:"username" validate:"required,email"`
+	RoleId   int8   `json:"-"`
+	RoleInfo Role   `gorm:"references:RoleId;foreignKey:RoleId" json:"role_info"`
 }
 
 func (Account) TableName() string {
@@ -178,8 +184,17 @@ func (CustomerOrder) TableName() string {
 func (CustomerOrder) ColumnCustomerOrderId() string {
 	return "customer_order_id"
 }
+func (CustomerOrder) ColumnStatus() string {
+	return "status"
+}
 
 func (d *CustomerOrder) MarshalJSON() ([]byte, error) {
+	formatNullableTime := func(t *time.Time) string {
+		if t != nil {
+			return t.Format("2006-01-02")
+		}
+		return "" // Return empty string for nil time
+	}
 	type Alias CustomerOrder
 	return json.Marshal(&struct {
 		*Alias
@@ -188,7 +203,7 @@ func (d *CustomerOrder) MarshalJSON() ([]byte, error) {
 	}{
 		Alias:     (*Alias)(d),
 		TCreate:   d.TCreate.Format("2006-01-02"),
-		TDelivery: d.TDelivery.Format("2006-01-02"),
+		TDelivery: formatNullableTime(d.TDelivery),
 	})
 }
 
@@ -278,6 +293,15 @@ type PromotionInput struct {
 	DateStart     string `json:"date_start"`
 	DateEnd       string `json:"date_end"`
 	Description   string `json:"description"`
+}
+type PromotionAndPercent struct {
+	PromotionId        string    `json:"promotion_id"`
+	PromotionName      string    `json:"promotion_name"`
+	DateStart          time.Time `json:"date_start"`
+	DateEnd            time.Time `json:"date_end"`
+	Description        string    `json:"description"`
+	EmployeeId         string    `json:"employee_id"`
+	DiscountPercentage float32   `json:"discount_percentage"`
 }
 
 func (Promotion) TableName() string {

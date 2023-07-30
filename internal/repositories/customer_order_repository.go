@@ -18,6 +18,9 @@ type CustomerOrderRepository interface {
 	RemoveProductsToCart(cart models.Cart) error
 	GetAllProductsInCart(customerId string) ([]*models.Cart, error)
 	GetAllCustomerOrders() ([]models.CustomerOrder, error)
+	GetAllCustomerOrdersByStatus(listStatus []int8) ([]models.CustomerOrder, error)
+
+	UpdateStatusCustomerOrder(id string, status int8) error
 }
 
 type c_order_repos struct {
@@ -94,8 +97,9 @@ func (r *c_order_repos) GetAllProductsInCart(customerId string) ([]*models.Cart,
 
 func (r *c_order_repos) UpdateCustomerOrder(customerOrder models.UpdatingCustomerOrder) error {
 	fmt.Println(customerOrder)
-	result := internal.Db.Debug().Model(&models.CustomerOrder{}).
-		Where(fmt.Sprintf("customer_order_id = ?"), customerOrder.CustomerOrderId).
+	model := &models.CustomerOrder{}
+	result := internal.Db.Debug().Model(model).
+		Where(fmt.Sprintf("%s = ?", model.ColumnCustomerOrderId()), customerOrder.CustomerOrderId).
 		Updates(&models.CustomerOrder{
 			TDelivery:   &customerOrder.TDelivery,
 			Status:      customerOrder.Status,
@@ -121,8 +125,27 @@ func (r *c_order_repos) UpdatePaymentStatusCustomerOrder(id string, paymentStatu
 }
 
 func (r *c_order_repos) GetAllCustomerOrders() ([]models.CustomerOrder, error) {
-	var customerOrder []models.CustomerOrder
-	err := internal.Db.Debug().
-		Find(&customerOrder).Error
-	return customerOrder, err
+	var customerOrders []models.CustomerOrder
+
+	err := internal.Db.Debug().Table(models.CustomerOrder{}.TableName()).
+		Scan(&customerOrders).Error
+	return customerOrders, err
+}
+func (r *c_order_repos) UpdateStatusCustomerOrder(id string, status int8) error {
+	model := &models.CustomerOrder{}
+	res := internal.Db.Debug().Model(model).Where(fmt.Sprintf("%s = ?", model.ColumnCustomerOrderId()), id).
+		Update("status", status)
+	if res.Error != nil {
+		return res.Error
+	}
+	internal.Log.Info("UpdateStatusCustomerOrder", zap.Any("Number of records", res.RowsAffected))
+	return nil
+}
+func (r *c_order_repos) GetAllCustomerOrdersByStatus(listStatus []int8) ([]models.CustomerOrder, error) {
+	var customerOrders []models.CustomerOrder
+	model := models.CustomerOrder{}
+	err := internal.Db.Debug().Table(models.CustomerOrder{}.TableName()).
+		Where(fmt.Sprintf("%s.%s IN ?", model.TableName(), model.ColumnStatus()), listStatus).
+		Scan(&customerOrders).Error
+	return customerOrders, err
 }
