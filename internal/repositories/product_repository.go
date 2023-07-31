@@ -44,16 +44,20 @@ func (r *product_repos) GetTopSellingProducts() ([]models.ProductAndFrequency, e
 	// var model models.Product
 	err := internal.Db.Debug().
 		Table("customer_order_detail").
+		Preload("PromotionDetailInfo").
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
-		Select("product.*, SUM(customer_order_detail.product_id) AS frequency").
+		Select("product.*, SUM(customer_order_detail.amount) AS frequency").
 		Joins("INNER JOIN product ON customer_order_detail.product_id = product.product_id").
 		Where("customer_order_id IN (SELECT customer_order_id FROM customer_order WHERE t_delivery BETWEEN ? AND ? AND customer_order.status = 3 AND payment_status = 2)", time.Now().AddDate(0, 0, -30), time.Now()).
 		Group("customer_order_detail.product_id").
 		Order("frequency DESC").
 		Limit(5).
-		Find(&products)
-	return products, err.Error
+		Find(&products).Error
+	if err != nil {
+		internal.Log.Error("GetTopSellingProducts", zap.Any("Error", err))
+	}
+	return products, err
 }
 
 func (r *product_repos) GetNewReleaseProducts() ([]models.Product, error) {
@@ -71,6 +75,7 @@ func (r *product_repos) GetProduct(productId string) (*models.Product, error) {
 	model := &models.Product{}
 
 	result := internal.Db.Where(fmt.Sprintf("%s = ?", model.ColumnProductId()), productId).
+		Preload("PromotionDetailInfo").
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
 		First(&model).Error
