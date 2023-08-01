@@ -3,8 +3,6 @@ package models
 import (
 	"encoding/json"
 	"time"
-
-	"github.com/CabIsMe/tttn-wine-be/internal/utils"
 )
 
 var Cos = InitCustomerOrderStatusObject()
@@ -266,7 +264,7 @@ func (d *Bill) MarshalJSON() ([]byte, error) {
 		TCreate string `json:"t_create"`
 	}{
 		Alias:   (*Alias)(d),
-		TCreate: d.TCreate.Format(utils.YMD_HM),
+		TCreate: d.TCreate.Format("2006/01/02 15:04"),
 	})
 }
 

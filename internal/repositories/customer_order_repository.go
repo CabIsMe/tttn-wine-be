@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
@@ -19,7 +20,7 @@ type CustomerOrderRepository interface {
 	GetAllProductsInCart(customerId string) ([]*models.Cart, error)
 	GetAllCustomerOrders() ([]models.CustomerOrder, error)
 	GetAllCustomerOrdersByStatus(listStatus []int8) ([]models.CustomerOrder, error)
-
+	GetCustomerOrder(customerId string) (*models.CustomerOrder, error)
 	UpdateStatusCustomerOrder(id string, status int8) error
 }
 
@@ -148,4 +149,17 @@ func (r *c_order_repos) GetAllCustomerOrdersByStatus(listStatus []int8) ([]model
 		Where(fmt.Sprintf("%s.%s IN ?", model.TableName(), model.ColumnStatus()), listStatus).
 		Scan(&customerOrders).Error
 	return customerOrders, err
+}
+func (r *c_order_repos) GetCustomerOrder(customerOrderId string) (*models.CustomerOrder, error) {
+	model := &models.CustomerOrder{}
+
+	result := internal.Db.Where(fmt.Sprintf("%s = ? AND %s > ? AND %s < ?", model.ColumnCustomerOrderId(), model.ColumnStatus(), model.ColumnStatus()),
+		customerOrderId, 1, 4).
+		Preload("CustomerOrderDetailInfo").
+		First(&model).Error
+	if errors.Is(result, gorm.ErrRecordNotFound) {
+		internal.Log.Error("GetCustomerOrder", zap.Any("Error query", result))
+		return nil, nil
+	}
+	return model, result
 }

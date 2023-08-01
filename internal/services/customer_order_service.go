@@ -24,6 +24,7 @@ type CustomerOrderService interface {
 	AllCustomerOrdersService() (interface{}, *internal.SystemStatus)
 	AllCustomerOrdersByStatusService(listStt []int8) (interface{}, *internal.SystemStatus)
 	AllDelivererIdsService() ([]models.Employee, *internal.SystemStatus)
+	GetCustomerOrderService(customerOrderId string) (*models.CustomerOrder, *internal.SystemStatus)
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -252,4 +253,11 @@ func (s *c_order_service) AllDelivererIdsService() ([]models.Employee, *internal
 	}
 	internal.Log.Info("AllDelivererIdsService", zap.Any("listResults", listResults))
 	return listResults, nil
+}
+func (s *c_order_service) GetCustomerOrderService(customerOrderId string) (*models.CustomerOrder, *internal.SystemStatus) {
+	result, err := s.rp.GetCustomerOrder(customerOrderId)
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return result, nil
 }

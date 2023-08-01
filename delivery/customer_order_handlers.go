@@ -24,6 +24,7 @@ type CustomerOrderHandler interface {
 	UpdateStatusCustomerOrderHandler(ctx *fiber.Ctx) error
 	AllDeliverersHandler(ctx *fiber.Ctx) error
 	UpdatePaymentStatusHandler(ctx *fiber.Ctx) error
+	GetCustomerOrderHandler(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -402,5 +403,42 @@ func (h *c_order_handler) AllDeliverersHandler(ctx *fiber.Ctx) error {
 		Status: 1,
 		Msg:    "OK",
 		Detail: listData,
+	})
+}
+func (h *c_order_handler) GetCustomerOrderHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("GetCustomerOrderHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	payload := &struct {
+		CustomerOrderId string `json:"customer_order_id" validate:"required"`
+	}{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		return ctx.Status(http.StatusOK).JSON(models.Resp{
+			Status: internal.CODE_WRONG_PARAMS,
+			Msg:    internal.MSG_WRONG_PARAMS,
+		})
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	result, errGet := h.MainServices.CustomerOrderService.GetCustomerOrderService(payload.CustomerOrderId)
+	if errGet != nil {
+		return ctx.Status(200).JSON(errGet)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: result,
 	})
 }

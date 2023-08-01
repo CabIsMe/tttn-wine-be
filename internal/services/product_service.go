@@ -66,3 +66,4 @@ func (s *product_service) PromotionalProductsService() ([]models.Product, *inter
 	}
 	return listData, nil
 }
+
