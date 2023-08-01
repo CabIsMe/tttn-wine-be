@@ -10,6 +10,11 @@ import (
 	"github.com/golang-module/carbon/v2"
 )
 
+const (
+	YMD_HM = "2006/01/02 15:04"
+	YMD    = "2006-01-02"
+)
+
 func GetTimeUTC7() time.Time {
 	now := time.Now()
 	loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")

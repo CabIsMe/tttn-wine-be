@@ -3,6 +3,8 @@ package models
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/CabIsMe/tttn-wine-be/internal/utils"
 )
 
 var Cos = InitCustomerOrderStatusObject()
@@ -256,6 +258,22 @@ type Bill struct {
 	CustomerOrderId string    `json:"customer_order_id"`
 	EmployeeId      string    `json:"employee_id"`
 }
+
+func (d *Bill) MarshalJSON() ([]byte, error) {
+	type Alias Bill
+	return json.Marshal(&struct {
+		*Alias
+		TCreate string `json:"t_create"`
+	}{
+		Alias:   (*Alias)(d),
+		TCreate: d.TCreate.Format(utils.YMD_HM),
+	})
+}
+
+func (Bill) TableName() string {
+	return "bill"
+}
+
 type ReturnOrder struct {
 	ReturnOrderId   string    `json:"return_order_id"`
 	TCreate         time.Time `json:"t_create"`
