@@ -62,7 +62,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/inside/list-deliverers", handlers.VerifyTokenInside, handlers.AllDeliverersHandler)
 		AppServer.Post("/inside/create-bill", handlers.VerifyTokenInside, handlers.CreateBillHandler)
 		AppServer.Post("/inside/get-bill-by-order", handlers.VerifyTokenInside, handlers.GetBillByCustomerOrderIdHandler)
-		AppServer.Post("inside/get-customer-order", handlers.GetCustomerOrderHandler)
+		AppServer.Post("inside/get-customer-order", handlers.GetCustomerOrderToCreateBillHandler)
 		AppServer.Get("/inside/list-status-customer-orders", handlers.VerifyTokenInside, func(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusOK).JSON(models.Cos)
 		})

@@ -24,7 +24,7 @@ type CustomerOrderHandler interface {
 	UpdateStatusCustomerOrderHandler(ctx *fiber.Ctx) error
 	AllDeliverersHandler(ctx *fiber.Ctx) error
 	UpdatePaymentStatusHandler(ctx *fiber.Ctx) error
-	GetCustomerOrderHandler(ctx *fiber.Ctx) error
+	GetCustomerOrderToCreateBillHandler(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -405,7 +405,7 @@ func (h *c_order_handler) AllDeliverersHandler(ctx *fiber.Ctx) error {
 		Detail: listData,
 	})
 }
-func (h *c_order_handler) GetCustomerOrderHandler(ctx *fiber.Ctx) error {
+func (h *c_order_handler) GetCustomerOrderToCreateBillHandler(ctx *fiber.Ctx) error {
 	resultError := models.Resp{
 		Status: internal.CODE_WRONG_PARAMS,
 		Msg:    internal.MSG_WRONG_PARAMS,
@@ -432,7 +432,7 @@ func (h *c_order_handler) GetCustomerOrderHandler(ctx *fiber.Ctx) error {
 		resultError.Detail = utils.ShowErrors(errs)
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
-	result, errGet := h.MainServices.CustomerOrderService.GetCustomerOrderService(payload.CustomerOrderId)
+	result, errGet := h.MainServices.CustomerOrderService.GetCustomerOrderToCreateBillService(payload.CustomerOrderId)
 	if errGet != nil {
 		return ctx.Status(200).JSON(errGet)
 	}
