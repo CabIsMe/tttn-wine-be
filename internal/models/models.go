@@ -242,6 +242,7 @@ type CustomerOrderDetail struct {
 	CustomerOrderId       string  `json:"customer_order_id"`
 	Amount                int     `json:"amount" validate:"required"`
 	Cost                  float32 `json:"cost" validate:"required"`
+	ProductInfo           Product `json:"product_info" gorm:"references:ProductId;foreignKey:ProductId"`
 }
 
 func (CustomerOrderDetail) TableName() string {

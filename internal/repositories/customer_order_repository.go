@@ -156,6 +156,7 @@ func (r *c_order_repos) GetCustomerOrderToCreateBill(customerOrderId string) (*m
 	result := internal.Db.Where(fmt.Sprintf("%s = ? AND %s > ? AND %s < ?", model.ColumnCustomerOrderId(), model.ColumnStatus(), model.ColumnStatus()),
 		customerOrderId, 1, 4).
 		Preload("CustomerOrderDetailInfo").
+		Preload("CustomerOrderDetailInfo.ProductInfo").
 		First(&model).Error
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		internal.Log.Error("GetCustomerOrderToCreateBill", zap.Any("Error query", result))
