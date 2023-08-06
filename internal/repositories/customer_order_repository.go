@@ -22,6 +22,7 @@ type CustomerOrderRepository interface {
 	GetAllCustomerOrdersByStatus(listStatus []int8) ([]models.CustomerOrder, error)
 	GetCustomerOrderToCreateBill(customerId string) (*models.CustomerOrder, error)
 	UpdateStatusCustomerOrder(id string, status int8) error
+	GetRevenueDateToDate(dateFrom, dateTo string) ([]models.RevenueByDate, error)
 }
 
 type c_order_repos struct {
@@ -152,7 +153,6 @@ func (r *c_order_repos) GetAllCustomerOrdersByStatus(listStatus []int8) ([]model
 }
 func (r *c_order_repos) GetCustomerOrderToCreateBill(customerOrderId string) (*models.CustomerOrder, error) {
 	model := &models.CustomerOrder{}
-
 	result := internal.Db.Where(fmt.Sprintf("%s = ? AND %s > ? AND %s < ?", model.ColumnCustomerOrderId(), model.ColumnStatus(), model.ColumnStatus()),
 		customerOrderId, 1, 4).
 		Preload("CustomerOrderDetailInfo").
@@ -163,4 +163,14 @@ func (r *c_order_repos) GetCustomerOrderToCreateBill(customerOrderId string) (*m
 		return nil, nil
 	}
 	return model, result
+}
+func (r *c_order_repos) GetRevenueDateToDate(dateFrom, dateTo string) ([]models.RevenueByDate, error) {
+	var results []models.RevenueByDate
+	if err := internal.Db.Debug().
+		Raw("CALL CalculateRevenueByDateRange(?, ?)", dateFrom, dateTo).
+		Scan(&results).Error; err != nil {
+		internal.Log.Error("GetRevenueDateToDate", zap.Any("Error SP", err))
+		return nil, err
+	}
+	return results, nil
 }

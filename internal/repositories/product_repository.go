@@ -18,6 +18,7 @@ type ProductRepository interface {
 	GetProduct(productId string) (*models.Product, error)
 	GetProductsByName(productName string) ([]models.Product, error)
 	GetPromotionalProducts() ([]models.Product, error)
+	GetProductsByTypeAndBrand(productId string) ([]models.Product, error)
 }
 
 type product_repos struct {
@@ -111,4 +112,19 @@ func (r *product_repos) GetPromotionalProducts() ([]models.Product, error) {
 		Preload("PromotionDetailInfo").
 		Find(&products).Error
 	return products, err
+}
+func (r *product_repos) GetProductsByTypeAndBrand(productId string) ([]models.Product, error) {
+	var products []models.Product
+	var product models.Product
+	subquery := internal.Db.Debug().Table(product.TableName()).
+		Select("brand_id, category_id").
+		Where(fmt.Sprintf("%s = ?", product.ColumnProductId()), productId)
+
+	err := internal.Db.Debug().Model(&product).
+		Where("(brand_id, category_id) IN (?)", subquery).Find(&products).Error
+	if err != nil {
+		internal.Log.Error("GetProductsByTypeAndBrand", zap.Any("Error", err))
+		return nil, err
+	}
+	return products, nil
 }

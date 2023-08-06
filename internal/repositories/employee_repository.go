@@ -48,6 +48,7 @@ func (r *employee_repos) GetAccountInfo(username string) (*models.AccountInfo, e
 	model := &models.AccountInfo{}
 	result := internal.Db.Table("accounts").
 		Preload("RoleInfo").
+		Preload("EmployeeInfo").
 		Where(fmt.Sprintf("%s = ?", "accounts.username"), username).
 		First(&model).Error
 	if errors.Is(result, gorm.ErrRecordNotFound) {

@@ -63,6 +63,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/inside/create-bill", handlers.VerifyTokenInside, handlers.CreateBillHandler)
 		AppServer.Post("/inside/get-bill-by-order", handlers.VerifyTokenInside, handlers.GetBillByCustomerOrderIdHandler)
 		AppServer.Post("inside/get-customer-order", handlers.GetCustomerOrderToCreateBillHandler)
+		AppServer.Post("/inside/get-revenue", handlers.VerifyTokenInside, handlers.GetRevenueDateToDateHandler)
 		AppServer.Get("/inside/list-status-customer-orders", handlers.VerifyTokenInside, func(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusOK).JSON(models.Cos)
 		})
@@ -71,6 +72,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
 		AppServer.Get("/client/list-top-products", handlers.TopSellingProductsHandler)
 		AppServer.Get("/client/list-promotional-products", handlers.PromotionalProductsHandler)
+		AppServer.Post("/client/list-relevant-products", handlers.GetProductsByTypeAndBrandHandler)
 		AppServer.Get("/client/get-promotion-by-date", handlers.GetPromotionByDateHandler)
 		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
 		AppServer.Post("/client/get-product", handlers.GetProductHandler)

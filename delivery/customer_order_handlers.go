@@ -25,6 +25,7 @@ type CustomerOrderHandler interface {
 	AllDeliverersHandler(ctx *fiber.Ctx) error
 	UpdatePaymentStatusHandler(ctx *fiber.Ctx) error
 	GetCustomerOrderToCreateBillHandler(ctx *fiber.Ctx) error
+	GetRevenueDateToDateHandler(ctx *fiber.Ctx) error
 }
 type c_order_handler struct {
 	services.MainServices
@@ -440,5 +441,45 @@ func (h *c_order_handler) GetCustomerOrderToCreateBillHandler(ctx *fiber.Ctx) er
 		Status: 1,
 		Msg:    "OK",
 		Detail: result,
+	})
+}
+func (h *c_order_handler) GetRevenueDateToDateHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("GetRevenueDateToDateHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	payload := &struct {
+		DateFrom string `json:"date_from" validate:"required"`
+		DateTo   string `json:"date_to" validate:"required"`
+	}{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		return ctx.Status(http.StatusOK).JSON(models.Resp{
+			Status: internal.CODE_WRONG_PARAMS,
+			Msg:    internal.MSG_WRONG_PARAMS,
+		})
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	result, errService := h.MainServices.CustomerOrderService.GetRevenueDateToDateService(payload.DateFrom, payload.DateTo)
+	if errService != nil {
+		return ctx.Status(200).JSON(errService)
+	}
+	listData := make(map[string]interface{})
+	listData["listData"] = result
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: listData,
 	})
 }

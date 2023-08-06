@@ -38,7 +38,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES ('cabcab@gmail.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('davidjohnson@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('hoangvane@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',1),('janesmith@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('johndoe@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('phamthid@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',1);
+INSERT INTO `accounts` VALUES ('bac@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',3),('cabcab@gmail.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('davidjohnson@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('hoang@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',3),('hoangvane@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',1),('janesmith@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('johndoe@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',2),('phamthid@example.com','$2a$10$/oULmiYRaK7.Mcb7CS5.VeNxE54nYMjgo7d9pgFuzOnIwNKj.fsGe',1);
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -71,6 +71,7 @@ CREATE TABLE `bill` (
 
 LOCK TABLES `bill` WRITE;
 /*!40000 ALTER TABLE `bill` DISABLE KEYS */;
+INSERT INTO `bill` VALUES ('HO8D6dv4AfUZuv_heD2Y2','2023-08-05 16:52:52','','','h3oGekBlF16TKYMvnJ8BF','EID1689051600');
 /*!40000 ALTER TABLE `bill` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,7 +125,6 @@ CREATE TABLE `cart` (
 
 LOCK TABLES `cart` WRITE;
 /*!40000 ALTER TABLE `cart` DISABLE KEYS */;
-INSERT INTO `cart` VALUES ('gj6xxjLVV8aA3SvrGJZCQ','gK4WEYrHboLOrD6l-GWPA',3),('gj6xxjLVV8aA3SvrGJZCQ','jubCMIqrRxcXAuS0W776J',1),('gj6xxjLVV8aA3SvrGJZCQ','mhLO-C5PXeTEIFT24fJDm',1),('gj6xxjLVV8aA3SvrGJZCQ','NYDrjSfRAcpyG8SNNN7kW',1),('gj6xxjLVV8aA3SvrGJZCQ','TRs0bA-26BsBKBNPKbp32',1);
 /*!40000 ALTER TABLE `cart` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -219,7 +219,7 @@ CREATE TABLE `customer_order` (
 
 LOCK TABLES `customer_order` WRITE;
 /*!40000 ALTER TABLE `customer_order` DISABLE KEYS */;
-INSERT INTO `customer_order` VALUES ('Dp6J3Zb3NekIcEZIfaB27','2023-07-20 16:53:54','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935','2023-07-20 00:00:00',1,1,'EID1689051600','EID1688965200','gj6xxjLVV8aA3SvrGJZCQ'),('ntKndB0rFyJy9IAnLRIms','2023-07-20 15:26:59','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935','2023-07-20 00:00:00',2,1,'EID1689051600','EID1688965200','gj6xxjLVV8aA3SvrGJZCQ');
+INSERT INTO `customer_order` VALUES ('3mxsj9n1rp-MwWTF0oV6p','2023-08-05 10:48:14','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935','2023-08-13 00:00:00',2,2,'EID1689051600','EID1689051620','gj6xxjLVV8aA3SvrGJZCQ'),('8GQss0qd-FNdvLnasiEVY','2023-07-18 15:26:59','Hoang Van Thu','Ho Chi Minh','0123456789','2023-07-22 00:00:00',3,2,'EID1689051600','EID1689051620','hJ5Ly8WYdIrb34MJNnauQ'),('Ap1uSGO2GTM454TDlcUT3','2023-07-20 15:26:59','Hoang Van Thu','Ho Chi Minh','0123456789','2023-07-23 00:00:00',3,2,'EID1689051600','EID1689051620','hJ5Ly8WYdIrb34MJNnauQ'),('Dp6J3Zb3NekIcEZIfaB27','2023-07-29 16:53:54','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935','2023-08-06 00:00:00',2,1,'EID1689051600','EID1689051620','gj6xxjLVV8aA3SvrGJZCQ'),('E-4la8n_b78XhPwCA8SlC','2023-08-05 10:54:04','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935',NULL,1,2,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ'),('Ewj4jd4ZwT5sy3UBy9Nur','2023-08-05 18:13:38','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935',NULL,1,2,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ'),('F3S_MJle4XxfMA9wNw2s2','2023-08-05 18:12:20','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935',NULL,1,1,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ'),('fJPIiELTjIDROGnBYUq6C','2023-07-17 15:26:59','Hoang Van Thu','Ho Chi Minh','0123456789','2023-07-25 00:00:00',3,2,'EID1689051600','EID1689051620','hJ5Ly8WYdIrb34MJNnauQ'),('h3oGekBlF16TKYMvnJ8BF','2023-07-30 20:35:24','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935','2023-08-04 00:00:00',2,2,'EID1689051600','EID1689051610','gj6xxjLVV8aA3SvrGJZCQ'),('iDgRN-DbTIl_QsbE54-0q','2023-07-24 15:26:59','Hoang Van Thu','Ho Chi Minh','0123456789','2023-07-27 00:00:00',3,2,'EID1689051600','EID1689051620','hJ5Ly8WYdIrb34MJNnauQ'),('ntKndB0rFyJy9IAnLRIms','2023-07-10 15:26:59','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935','2023-07-17 00:00:00',3,2,'EID1689051600','EID1688965200','gj6xxjLVV8aA3SvrGJZCQ'),('p1k7oHSW5F9fGyX86Mrwe','2023-07-29 21:24:01','Le Van Luon','asdasd','0982777935',NULL,1,1,NULL,NULL,'hJ5Ly8WYdIrb34MJNnauQ'),('szi3MPHMLXc1Al1Ai0fRq','2023-08-05 10:42:15','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935',NULL,1,1,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ'),('w6KwLji8g2EOY3i60Z3yc','2023-07-30 16:13:09','Nguyen Dang Bac','Số 5, Đường DEF, Quận GHI, Thành phố Đà Nẵng','0982777935',NULL,1,2,NULL,NULL,'gj6xxjLVV8aA3SvrGJZCQ');
 /*!40000 ALTER TABLE `customer_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -250,7 +250,7 @@ CREATE TABLE `customer_order_detail` (
 
 LOCK TABLES `customer_order_detail` WRITE;
 /*!40000 ALTER TABLE `customer_order_detail` DISABLE KEYS */;
-INSERT INTO `customer_order_detail` VALUES ('629IBoS10PyrA8IJIvyHt','fK34Dy-iitHdBj0U-36W4','ntKndB0rFyJy9IAnLRIms',1,50),('aYQaPDqAfqRK9E6crFvX6','jubCMIqrRxcXAuS0W776J','Dp6J3Zb3NekIcEZIfaB27',1,50),('HTFfGxLPQBvSCSVtQnUqa','7wS-8EN5-KmDMSumetyIS','ntKndB0rFyJy9IAnLRIms',2,24.5),('OahR1YyTC1kmDbXRNbGXY','gK4WEYrHboLOrD6l-GWPA','ntKndB0rFyJy9IAnLRIms',1,50),('UNWp1RInRp6VI65gBJINK','fK34Dy-iitHdBj0U-36W4','Dp6J3Zb3NekIcEZIfaB27',1,50);
+INSERT INTO `customer_order_detail` VALUES ('0PBFkPOpEsf6n7TkLnei4','jubCMIqrRxcXAuS0W776J','h3oGekBlF16TKYMvnJ8BF',5,50),('2I8RGj-JC-wrlzA32ndIP','TRs0bA-26BsBKBNPKbp32','Ewj4jd4ZwT5sy3UBy9Nur',1,50),('3K3OaMHMoKBn7ntGha-LY','jubCMIqrRxcXAuS0W776J','E-4la8n_b78XhPwCA8SlC',1,50),('629IBoS10PyrA8IJIvyHt','fK34Dy-iitHdBj0U-36W4','ntKndB0rFyJy9IAnLRIms',1,50),('6diev8TVe_vLIJR34XRV3','jubCMIqrRxcXAuS0W776J','3mxsj9n1rp-MwWTF0oV6p',1,50),('8HdzMPc3oni3gSidL-Nvo','fK34Dy-iitHdBj0U-36W4','szi3MPHMLXc1Al1Ai0fRq',1,50),('aYQaPDqAfqRK9E6crFvX6','jubCMIqrRxcXAuS0W776J','Dp6J3Zb3NekIcEZIfaB27',1,50),('cE6r8g9iG3EnRIGJQMNDw','jubCMIqrRxcXAuS0W776J','iDgRN-DbTIl_QsbE54-0q',1,49),('f18VB-rtEN0N2uDkI8lAQ','NYDrjSfRAcpyG8SNNN7kW','Ap1uSGO2GTM454TDlcUT3',2,49),('HTFfGxLPQBvSCSVtQnUqa','7wS-8EN5-KmDMSumetyIS','ntKndB0rFyJy9IAnLRIms',2,24.5),('MYPHxNJ3poMSkIFHpiGPU','jubCMIqrRxcXAuS0W776J','w6KwLji8g2EOY3i60Z3yc',1,50),('NE8J9O0z9C_AmbWgq5mV7','gK4WEYrHboLOrD6l-GWPA','h3oGekBlF16TKYMvnJ8BF',1,50),('nSOpysEmzN-No2jJeW6Si','NYDrjSfRAcpyG8SNNN7kW','p1k7oHSW5F9fGyX86Mrwe',2,49),('O1NmgMgko_1WXgzILpISn','TRs0bA-26BsBKBNPKbp32','h3oGekBlF16TKYMvnJ8BF',5,50),('OahR1YyTC1kmDbXRNbGXY','gK4WEYrHboLOrD6l-GWPA','ntKndB0rFyJy9IAnLRIms',1,50),('OHmxYhEhqv4_MJ_NBzITw','TRs0bA-26BsBKBNPKbp32','8GQss0qd-FNdvLnasiEVY',2,49),('UNWp1RInRp6VI65gBJINK','fK34Dy-iitHdBj0U-36W4','Dp6J3Zb3NekIcEZIfaB27',1,50),('VXIaeIv_oaiF-NLr304gN','TRs0bA-26BsBKBNPKbp32','F3S_MJle4XxfMA9wNw2s2',1,50),('Ws-JMze0F8OvOXHhWNQA0','7wS-8EN5-KmDMSumetyIS','h3oGekBlF16TKYMvnJ8BF',1,24.5),('Y_F3YOFaXNBHFGsduG4QZ','jubCMIqrRxcXAuS0W776J','fJPIiELTjIDROGnBYUq6C',3,49);
 /*!40000 ALTER TABLE `customer_order_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -282,7 +282,7 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
-INSERT INTO `employee` VALUES ('EID1688965200','Hoàng Văn E',1,'1988-09-25','Số 30, Đường STU, Quận VWX, Thành phố Hải Phòng','0945678901','hoangvane@example.com'),('EID1689051600','Phạm Thị D',0,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','phamthid@example.com');
+INSERT INTO `employee` VALUES ('EID1688965200','Hoàng Văn E',1,'1988-09-25','Số 30, Đường STU, Quận VWX, Thành phố Hải Phòng','0945678901','hoangvane@example.com'),('EID1689051600','Phạm Thị D',0,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','phamthid@example.com'),('EID1689051610','Hoàng Shipper',1,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','hoang@example.com'),('EID1689051620','Bắc Shipper',1,'1992-03-12','Số 15, Đường MNO, Quận PQR, Thành phố Cần Thơ','0934567890','bac@example.com');
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -375,7 +375,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',49,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',1,'Stocking',1,'BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Airén',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/071102-1.4913eea891cf816624c4a3b6dfad4652.jpg','Rosé wines are represented in the best way with this Bardolino Chiaretto. By blending several red varieties, a unique, elegant and fragrant rosé is produced. Along with the traditional fruity aromas, this wine also displays a unique thyme note towards the end.',17,'Stocking',0,'BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Wine Isla de Maipo, Cabernet Sauvignon, 2018',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092104-1.1fdcf7cee862d06e0d6917c56993a1d1.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Port Quinta das Arcas, Palmira Tawny Port',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/brut-roz-cricova.a2b1f0ea8366b7db9142bc8bceefcbc0.jpg','As the rosé capital of the world, you can only expect the very best from this Provence rosé. It is a complex and expressive wine that offers both vibrant fruit and floral notes. It is a true example of how exhilarating a rosé can be.',15,'Stocking',1,'BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Wine Altos Las Hormigas, Malbec Terroir Luján De Cuyo, 2016',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/052201-11.d79ca6ae9c38bb0c198100a8f4a50100.jpg','If ever there was a moreish rosé, it is this award-winning, aromatic wine. Not only does the wine offer vibrant flavors and acidity, but also offers layers of intense citrus and stone-fruit notes that leave you wanting more.',19,'Stocking',0,'BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Frizzante Wine Arione, Bonarda dell\'Oltrepo Pavese 2021',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/101206-1.5707e31f0c1da611c0335450bcc75152.jpg','This rosé was produced using the utmost delicate practices, which has added immense to its uniqueness. By whole-bunch basket pressing, this wine expresses vibrancy, freshness and clean summer fruits like no other.',20,'Stocking',1,'BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Sauvignon Blanc',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/052203-111.9a6e82e23ea510e477eff5a959f5f414.jpg','This unique rosé combines two unique Portuguese varieties: Espadeiro and Touriga Nacional, which are hand-picked and pressed to create this slightly fizzy wine. It is an exceptional example of unique Portuguese wines.',20,'Stocking',1,'BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Tempranillo',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/072502-1.d88f1d989f0c6c216e4e7e6e7d32fba1.jpg','There is a charm that comes with a pink sparkling wine; especially when quality-winemaking is involved. This Pinot Noir sparkling wine has the perfect balance of structure, fruit, tannin and refreshing acidity that is suited for any celebratory occasion.',20,'Stocking',0,'BR210079','TW366960');
+INSERT INTO `product` VALUES ('7wS-8EN5-KmDMSumetyIS','Korta Reseva De Familia',49,'https://vinoteka.vn/assets/components/phpthumbof/cache/092121-1.1c7d8cfea75f219576db460999053e55.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',0,'Stocking',1,'BR530964','TW667968'),('fK34Dy-iitHdBj0U-36W4','Airén',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/071102-1.4913eea891cf816624c4a3b6dfad4652.jpg','Rosé wines are represented in the best way with this Bardolino Chiaretto. By blending several red varieties, a unique, elegant and fragrant rosé is produced. Along with the traditional fruity aromas, this wine also displays a unique thyme note towards the end.',16,'Stocking',0,'BR210079','TW366960'),('fZDcOL12Au_UBjqAv6kHj','Wine Isla de Maipo, Cabernet Sauvignon, 2018',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/092104-1.1fdcf7cee862d06e0d6917c56993a1d1.jpg','This prestigious Bordeaux wine boasts a deep red color with rich aromas of black currants, cedar, and tobacco. On the palate, it offers a harmonious blend of dark fruits, velvety tannins, and a long, elegant finish. Perfect for special occasions and pairing with fine cuisine.',20,'Stocking',1,'BR210079','TW366960'),('gK4WEYrHboLOrD6l-GWPA','Port Quinta das Arcas, Palmira Tawny Port',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/brut-roz-cricova.a2b1f0ea8366b7db9142bc8bceefcbc0.jpg','As the rosé capital of the world, you can only expect the very best from this Provence rosé. It is a complex and expressive wine that offers both vibrant fruit and floral notes. It is a true example of how exhilarating a rosé can be.',14,'Stocking',1,'BR530964','TW667968'),('jubCMIqrRxcXAuS0W776J','Wine Altos Las Hormigas, Malbec Terroir Luján De Cuyo, 2016',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/052201-11.d79ca6ae9c38bb0c198100a8f4a50100.jpg','If ever there was a moreish rosé, it is this award-winning, aromatic wine. Not only does the wine offer vibrant flavors and acidity, but also offers layers of intense citrus and stone-fruit notes that leave you wanting more.',7,'Stocking',0,'BR044023','TW264812'),('mhLO-C5PXeTEIFT24fJDm','Frizzante Wine Arione, Bonarda dell\'Oltrepo Pavese 2021',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/101206-1.5707e31f0c1da611c0335450bcc75152.jpg','This rosé was produced using the utmost delicate practices, which has added immense to its uniqueness. By whole-bunch basket pressing, this wine expresses vibrancy, freshness and clean summer fruits like no other.',20,'Stocking',1,'BR210079','TW366960'),('NYDrjSfRAcpyG8SNNN7kW','Sauvignon Blanc',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/052203-111.9a6e82e23ea510e477eff5a959f5f414.jpg','This unique rosé combines two unique Portuguese varieties: Espadeiro and Touriga Nacional, which are hand-picked and pressed to create this slightly fizzy wine. It is an exceptional example of unique Portuguese wines.',16,'Stocking',1,'BR530964','TW667968'),('TRs0bA-26BsBKBNPKbp32','Tempranillo',50,'https://vinoteka.vn/assets/components/phpthumbof/cache/072502-1.d88f1d989f0c6c216e4e7e6e7d32fba1.jpg','There is a charm that comes with a pink sparkling wine; especially when quality-winemaking is involved. This Pinot Noir sparkling wine has the perfect balance of structure, fruit, tannin and refreshing acidity that is suited for any celebratory occasion.',11,'Stocking',0,'BR210079','TW366960');
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -405,7 +405,7 @@ CREATE TABLE `promotion` (
 
 LOCK TABLES `promotion` WRITE;
 /*!40000 ALTER TABLE `promotion` DISABLE KEYS */;
-INSERT INTO `promotion` VALUES ('N5sMhJnFE_3GQXHV9UTUa','new promotion','2023-07-11','2023-07-22','empty','EID1689051600');
+INSERT INTO `promotion` VALUES ('N5sMhJnFE_3GQXHV9UTUa','new promotion','2023-07-11','2023-08-22','empty','EID1689051600');
 /*!40000 ALTER TABLE `promotion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -623,9 +623,43 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'admin'),(2,'client');
+INSERT INTO `roles` VALUES (1,'admin'),(2,'client'),(3,'deliverer ');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'tttn'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `CalculateRevenueByDateRange` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CalculateRevenueByDateRange`(
+  IN fromDate DATE,
+  IN toDate DATE
+)
+BEGIN
+  SELECT t_create as `date`, count(co.customer_order_id) as total_amount, (cod.amount*cod.cost) as revenue
+  FROM customer_order as co
+  INNER JOIN customer_order_detail as cod ON cod.customer_order_id= co.customer_order_id
+  WHERE co.t_create >= fromDate AND co.t_create <= toDate AND co.status = 3 
+	AND co.customer_order_id NOT IN 
+		(SELECT customer_order_id from return_order
+		WHERE t_create >= fromDate AND t_create <= toDate)
+  GROUP BY t_create
+  ORDER BY t_create;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -636,4 +670,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-27 21:44:02
+-- Dump completed on 2023-08-06 23:32:12

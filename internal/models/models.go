@@ -40,9 +40,11 @@ type Account struct {
 	RoleInfo     Role   `gorm:"references:RoleId;foreignKey:RoleId" json:"role_info"`
 }
 type AccountInfo struct {
-	Username string `json:"username" validate:"required,email"`
-	RoleId   int8   `json:"-"`
-	RoleInfo Role   `gorm:"references:RoleId;foreignKey:RoleId" json:"role_info"`
+	Username     string    `json:"username" validate:"required,email"`
+	RoleId       int8      `json:"-"`
+	RoleInfo     Role      `gorm:"references:RoleId;foreignKey:RoleId" json:"role_info"`
+	CustomerInfo *Customer `json:"customer_info" gorm:"references:Username;foreignKey:Email"`
+	EmployeeInfo *Employee `json:"employee_info" gorm:"references:Username;foreignKey:Email"`
 }
 
 func (Account) TableName() string {
@@ -213,6 +215,23 @@ type UpdatingCustomerOrder struct {
 	Status          int8      `json:"status"`
 	DelivererId     string    `json:"deliverer_id"`
 	EmployeeId      string    `json:"-"`
+}
+
+type RevenueByDate struct {
+	Date        time.Time `json:"date"`
+	TotalAmount int       `json:"total_amount"`
+	Revenue     float32   `json:"revenue"`
+}
+
+func (d *RevenueByDate) MarshalJSON() ([]byte, error) {
+	type Alias RevenueByDate
+	return json.Marshal(&struct {
+		*Alias
+		Date string `json:"date"`
+	}{
+		Alias: (*Alias)(d),
+		Date:  d.Date.Format("2006-01-02"),
+	})
 }
 
 type CustomerOrderStatusObject struct {
