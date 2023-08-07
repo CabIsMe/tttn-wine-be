@@ -116,6 +116,16 @@ func (Employee) ColumnEmail() string {
 	return "email"
 }
 
+type Deliverer struct {
+	EmployeeId        string    `json:"employee_id"`
+	FullName          string    `json:"full_name"`
+	Gender            string    `json:"gender"`
+	DateOfBirth       time.Time `json:"date_of_birth"`
+	Address           string    `json:"address"`
+	PhoneNumber       string    `json:"phone_number" validate:"max=11,min=10"`
+	Email             string    `json:"email"`
+	NumberOfDelivered int64     `json:"numberOfDelivered"`
+}
 type Product struct {
 	ProductId           string           `json:"product_id"`
 	ProductName         string           `json:"product_name"`

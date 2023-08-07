@@ -23,7 +23,7 @@ type CustomerOrderService interface {
 	UpdateStatusCustomerOrderService(customerOrderId string, stt int8) *internal.SystemStatus
 	AllCustomerOrdersService() (interface{}, *internal.SystemStatus)
 	AllCustomerOrdersByStatusService(listStt []int8) (interface{}, *internal.SystemStatus)
-	AllDelivererIdsService() ([]models.Employee, *internal.SystemStatus)
+	AllDelivererIdsService() (interface{}, *internal.SystemStatus)
 	GetCustomerOrderToCreateBillService(customerOrderId string) (*models.CustomerOrder, *internal.SystemStatus)
 	GetRevenueDateToDateService(fromDate, toDate string) ([]models.RevenueByDate, *internal.SystemStatus)
 }
@@ -246,7 +246,8 @@ func (s *c_order_service) AllCustomerOrdersByStatusService(listStt []int8) (inte
 	return listResults, nil
 }
 
-func (s *c_order_service) AllDelivererIdsService() ([]models.Employee, *internal.SystemStatus) {
+func (s *c_order_service) AllDelivererIdsService() (interface{}, *internal.SystemStatus) {
+	// []models.Employee
 	listResults, err := s.rp.GetAllDeliverers()
 	if err != nil {
 		internal.Log.Error("AllDelivererIdsService", zap.Any("err", err.Error()))

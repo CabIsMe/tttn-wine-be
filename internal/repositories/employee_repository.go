@@ -14,7 +14,7 @@ type EmployeeRepository interface {
 	GetEmployee(empId string) (*models.Employee, error)
 	GetEmployeeByEmail(email string) (*models.Employee, error)
 	GetAccountInfo(username string) (*models.AccountInfo, error)
-	GetAllDeliverers() ([]models.Employee, error)
+	GetAllDeliverers() ([]*models.Deliverer, error)
 }
 
 type employee_repos struct {
@@ -57,10 +57,10 @@ func (r *employee_repos) GetAccountInfo(username string) (*models.AccountInfo, e
 	}
 	return model, result
 }
-func (r *employee_repos) GetAllDeliverers() ([]models.Employee, error) {
+func (r *employee_repos) GetAllDeliverers() ([]*models.Deliverer, error) {
 	model := &models.Employee{}
 	account := &models.Account{}
-	var employees []models.Employee
+	var employees []*models.Deliverer
 	err := internal.Db.Debug().Table(model.TableName()).
 		Select("*").
 		Joins(fmt.Sprintf("INNER JOIN %s ON %s.%s = %s.%s", account.TableName(),
@@ -68,5 +68,19 @@ func (r *employee_repos) GetAllDeliverers() ([]models.Employee, error) {
 		Where(fmt.Sprintf("%s.%s = ?", account.TableName(), account.ColumnRoleId()), 3).
 		Find(&employees).
 		Error
+	if err != nil {
+		internal.Log.Error("GetAllDeliverers", zap.Any("Error Get ListDeliverers", err))
+		return nil, err
+	}
+	for _, record := range employees {
+		err = internal.Db.Debug().
+			Model(&models.CustomerOrder{}).
+			Where("deliverer_id = ? AND status = ?", record.EmployeeId, models.Cos.ORDER_CONFIRM.StatusCode).
+			Count(&record.NumberOfDelivered).Error
+		if err != nil {
+			internal.Log.Error("GetAllDeliverers", zap.Any("Error Get NumberOfDelivered", err))
+			return nil, err
+		}
+	}
 	return employees, err
 }
