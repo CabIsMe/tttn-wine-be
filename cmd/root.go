@@ -67,6 +67,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/inside/list-status-customer-orders", handlers.VerifyTokenInside, func(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusOK).JSON(models.Cos)
 		})
+		AppServer.Post("/inside/add-product", handlers.VerifyTokenInside, handlers.AddNewProductHandler)
 
 		// Client
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)

@@ -11,6 +11,7 @@ import (
 	"github.com/CabIsMe/tttn-wine-be/internal/services"
 	"github.com/CabIsMe/tttn-wine-be/internal/utils"
 	"github.com/gofiber/fiber/v2"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 	"go.uber.org/zap"
 )
 
@@ -22,9 +23,10 @@ type ProductHandler interface {
 	GetProductByNameHandler(ctx *fiber.Ctx) error
 	PromotionalProductsHandler(ctx *fiber.Ctx) error
 	GetProductsByTypeAndBrandHandler(ctx *fiber.Ctx) error
+	AddNewProductHandler(ctx *fiber.Ctx) error
 }
 type product_handler struct {
-	s services.MainServices
+	services.MainServices
 }
 
 func NewProductHandler(s services.MainServices) ProductHandler {
@@ -33,7 +35,7 @@ func NewProductHandler(s services.MainServices) ProductHandler {
 	}
 }
 func (h *product_handler) AllProductsHandler(ctx *fiber.Ctx) error {
-	results, err := h.s.AllProductsService()
+	results, err := h.MainServices.ProductService.AllProductsService()
 	if err != nil {
 		return ctx.Status(fiber.StatusOK).JSON(err)
 	}
@@ -44,7 +46,7 @@ func (h *product_handler) AllProductsHandler(ctx *fiber.Ctx) error {
 	})
 }
 func (h *product_handler) TopSellingProductsHandler(ctx *fiber.Ctx) error {
-	results, err := h.s.TopSellingProductsService()
+	results, err := h.MainServices.ProductService.TopSellingProductsService()
 	if err != nil {
 		return ctx.Status(fiber.StatusOK).JSON(err)
 	}
@@ -56,7 +58,7 @@ func (h *product_handler) TopSellingProductsHandler(ctx *fiber.Ctx) error {
 }
 
 func (h *product_handler) NewReleaseProductsHandler(ctx *fiber.Ctx) error {
-	results, err := h.s.NewReleaseProductsService()
+	results, err := h.MainServices.ProductService.NewReleaseProductsService()
 	if err != nil {
 		return ctx.Status(fiber.StatusOK).JSON(err)
 	}
@@ -86,7 +88,7 @@ func (h *product_handler) GetProductHandler(ctx *fiber.Ctx) error {
 			Detail: utils.ShowErrors(errs),
 		})
 	}
-	result, err := h.s.GetProductService(body.ProductId)
+	result, err := h.MainServices.ProductService.GetProductService(body.ProductId)
 	if err != nil {
 		return ctx.Status(200).JSON(err)
 	}
@@ -115,7 +117,7 @@ func (h *product_handler) GetProductByNameHandler(ctx *fiber.Ctx) error {
 			Detail: utils.ShowErrors(errs),
 		})
 	}
-	result, err := h.s.GetProductsByNameService(body.ProductName)
+	result, err := h.MainServices.ProductService.GetProductsByNameService(body.ProductName)
 	if err != nil {
 		return ctx.Status(200).JSON(err)
 	}
@@ -126,7 +128,7 @@ func (h *product_handler) GetProductByNameHandler(ctx *fiber.Ctx) error {
 	})
 }
 func (h *product_handler) PromotionalProductsHandler(ctx *fiber.Ctx) error {
-	results, err := h.s.PromotionalProductsService()
+	results, err := h.MainServices.ProductService.PromotionalProductsService()
 	if err != nil {
 		return ctx.Status(fiber.StatusOK).JSON(err)
 	}
@@ -196,7 +198,7 @@ func (h *product_handler) GetProductsByTypeAndBrandHandler(ctx *fiber.Ctx) error
 		resultError.Detail = utils.ShowErrors(errs)
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
-	listData, errGet := h.s.GetProductsByTypeAndBrandService(payload.CustomerOrderId)
+	listData, errGet := h.MainServices.ProductService.GetProductsByTypeAndBrandService(payload.CustomerOrderId)
 	if errGet != nil {
 		ctx.Status(http.StatusOK).JSON(errGet)
 	}
@@ -206,5 +208,41 @@ func (h *product_handler) GetProductsByTypeAndBrandHandler(ctx *fiber.Ctx) error
 		Status: 1,
 		Msg:    "OK",
 		Detail: output,
+	})
+}
+
+func (h *product_handler) AddNewProductHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("AddNewProductHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	var payload *models.Product
+	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
+		resultError.Detail = err.Error()
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	nanoId, _ := gonanoid.New()
+	payload.ProductId = nanoId
+	errCreate := h.MainServices.ProductService.AddNewProductService(*payload)
+	if errCreate != nil {
+		return ctx.Status(http.StatusOK).JSON(errCreate)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
 	})
 }

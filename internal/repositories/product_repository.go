@@ -19,6 +19,7 @@ type ProductRepository interface {
 	GetProductsByName(productName string) ([]models.Product, error)
 	GetPromotionalProducts() ([]models.Product, error)
 	GetProductsByTypeAndBrand(productId string) ([]models.Product, error)
+	AddNewProduct(product models.Product) error
 }
 
 type product_repos struct {
@@ -127,4 +128,7 @@ func (r *product_repos) GetProductsByTypeAndBrand(productId string) ([]models.Pr
 		return nil, err
 	}
 	return products, nil
+}
+func (r *product_repos) AddNewProduct(product models.Product) error {
+	return internal.Db.Debug().Create(&product).Error
 }
