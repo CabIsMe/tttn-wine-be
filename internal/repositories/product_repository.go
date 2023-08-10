@@ -33,10 +33,10 @@ func (r *product_repos) GetAllProducts() ([]models.Product, error) {
 	var products []models.Product
 	var model models.Product
 	err := internal.Db.Debug().
-		Select("*").
 		Table(model.TableName()).
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
+		Select("*").
 		Find(&products).Error
 	return products, err
 }

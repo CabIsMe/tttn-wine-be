@@ -134,8 +134,8 @@ type Product struct {
 	Description         string           `json:"description"`
 	InventoryNumber     int              `json:"inventory_number"`
 	Status              string           `json:"status"`
-	BrandId             string           `json:"brand_id" gorm:"->:false;<-:create"`
-	CategoryId          string           `json:"category_id" gorm:"->:false;<-:create"`
+	BrandId             string           `json:"brand_id"`
+	CategoryId          string           `json:"category_id"`
 	IsNew               int8             `json:"is_new"`
 	BrandInfo           *Brand           `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
 	CategoryInfo        *Category        `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
