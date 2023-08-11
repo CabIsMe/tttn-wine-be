@@ -3,6 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"sort"
 
@@ -160,8 +161,8 @@ func (h *product_handler) PromotionalProductsHandler(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusOK).JSON(errMarshal)
 	}
 	for _, item := range data {
-		item.DiscountedCost = item.Cost * (1 - item.PromotionDetailInfo.DiscountPercentage)
-		fmt.Println(item.DiscountedCost)
+		item.DiscountedCost = float32(math.Round(float64(item.Cost * (1 - item.PromotionDetailInfo.DiscountPercentage))))
+		fmt.Println((1 - item.PromotionDetailInfo.DiscountPercentage), item.DiscountedCost)
 	}
 	sort.SliceStable(data, func(i, j int) bool {
 		return data[i].PromotionDetailInfo.DiscountPercentage*100 > data[j].PromotionDetailInfo.DiscountPercentage*100
