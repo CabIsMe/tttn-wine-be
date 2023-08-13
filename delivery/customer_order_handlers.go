@@ -16,6 +16,7 @@ import (
 type CustomerOrderHandler interface {
 	AllCustomerOrdersHandler(ctx *fiber.Ctx) error
 	AllCustomerOrdersByStatusHandler(ctx *fiber.Ctx) error
+	AllCustomerOrdersByCustomerHandler(ctx *fiber.Ctx) error
 	CreateCustomerOrder(ctx *fiber.Ctx) error
 	AddProductsToCartHandler(ctx *fiber.Ctx) error
 	RemoveProductsToCartHandler(ctx *fiber.Ctx) error
@@ -380,6 +381,33 @@ func (h *c_order_handler) AllCustomerOrdersByStatusHandler(ctx *fiber.Ctx) error
 	listData, err := h.MainServices.CustomerOrderService.AllCustomerOrdersByStatusService(payload.ListStatus)
 	if err != nil {
 		internal.Log.Error("AllCustomerOrdersByStatusHandler", zap.Any("Error", err))
+		return ctx.Status(http.StatusOK).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: listData,
+	})
+}
+func (h *c_order_handler) AllCustomerOrdersByCustomerHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	var body interface{}
+	ctx.BodyParser(&body)
+	defer func() {
+		internal.Log.Info("AllCustomerOrdersByCustomerHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	customerId, ok := ctx.Locals("user_id").(string)
+	if !ok {
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	listData, err := h.MainServices.CustomerOrderService.GetCustomerOrderByCustomerService(customerId)
+	if err != nil {
+		internal.Log.Error("AllCustomerOrdersByCustomerHandler", zap.Any("Error", err))
 		return ctx.Status(http.StatusOK).JSON(err)
 	}
 	return ctx.Status(http.StatusOK).JSON(models.Resp{

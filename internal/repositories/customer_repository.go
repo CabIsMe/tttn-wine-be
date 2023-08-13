@@ -14,6 +14,7 @@ type CustomerRepository interface {
 	GetCustomer(empId string) (*models.Customer, error)
 	GetCustomerByEmail(email string) (*models.Customer, error)
 	UpdateCustomer(customer models.Customer) error
+	
 }
 
 type customer_repos struct {

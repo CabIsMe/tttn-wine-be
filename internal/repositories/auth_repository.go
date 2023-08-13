@@ -11,7 +11,7 @@ import (
 )
 
 type AuthRepository interface {
-	CreateAccountUser(payload models.Account) error
+	CreateAccountUser(payload models.AccountAndFullName) error
 	GetAccountByUsername(username string) (*models.Account, error)
 }
 
@@ -22,8 +22,31 @@ func NewAuthRepository() AuthRepository {
 	return &auth_repos{}
 }
 
-func (r *auth_repos) CreateAccountUser(payload models.Account) error {
-	return internal.Db.Debug().Create(&payload).Error
+func (r *auth_repos) CreateAccountUser(payload models.AccountAndFullName) error {
+	tx := internal.Db.Begin()
+	err := tx.Debug().Model(&models.Account{}).Create(models.Account{
+		Username:     payload.Email,
+		UserPassword: payload.Password,
+		RoleId:       payload.RoleId,
+	}).Error
+	if err != nil {
+		internal.Log.Error("CreateAccountUser", zap.Any("Error query", err))
+		tx.Rollback()
+		return err
+	}
+	err = tx.Debug().Table("customer").Select("customer_id", "email", "full_name").Create(&models.Customer{
+		CustomerId: payload.UserId,
+		FullName:   payload.Name,
+		Email:      payload.Email,
+	}).Error
+	if err != nil {
+		internal.Log.Error("CreateAccountUser", zap.Any("Error query", err))
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+	// return internal.Db.Debug().Create(&payload).Error
 }
 
 func (r *auth_repos) GetAccountByUsername(username string) (*models.Account, error) {

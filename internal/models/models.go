@@ -39,6 +39,14 @@ type Account struct {
 	RoleId       int8   `json:"-"`
 	RoleInfo     Role   `gorm:"references:RoleId;foreignKey:RoleId" json:"role_info"`
 }
+
+type AccountAndFullName struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+	UserId   string `json:"-"`
+	RoleId   int8   `json:"-"`
+	Name     string `json:"name" validate:"required"`
+}
 type AccountInfo struct {
 	Username     string    `json:"username" validate:"required,email"`
 	RoleId       int8      `json:"-"`
@@ -128,15 +136,15 @@ type Deliverer struct {
 }
 type Product struct {
 	ProductId           string           `json:"product_id"`
-	ProductName         string           `json:"product_name"`
-	Cost                float32          `json:"cost"`
+	ProductName         string           `json:"product_name" validate:"required"`
+	Cost                float32          `json:"cost" validate:"required"`
 	ProductImg          string           `json:"product_img"`
-	Description         string           `json:"description"`
-	InventoryNumber     int              `json:"inventory_number"`
+	Description         string           `json:"description" validate:"required"`
+	InventoryNumber     int              `json:"inventory_number" validate:"required"`
 	Status              string           `json:"status"`
-	BrandId             string           `json:"brand_id"`
-	CategoryId          string           `json:"category_id"`
-	IsNew               int8             `json:"is_new"`
+	BrandId             string           `json:"brand_id" validate:"required"`
+	CategoryId          string           `json:"category_id" validate:"required"`
+	IsNew               int8             `json:"is_new" validate:"required"`
 	BrandInfo           *Brand           `json:"brand_info" gorm:"references:BrandId;foreignKey:BrandId"`
 	CategoryInfo        *Category        `json:"category_info" gorm:"references:CategoryId;foreignKey:CategoryId"`
 	PromotionDetailInfo *PromotionDetail `gorm:"references:ProductId;foreignKey:ProductId" json:"promotion_detail_info"`
@@ -198,6 +206,9 @@ func (CustomerOrder) ColumnCustomerOrderId() string {
 }
 func (CustomerOrder) ColumnStatus() string {
 	return "status"
+}
+func (CustomerOrder) ColumnCustomerId() string {
+	return "customer_id"
 }
 
 func (d *CustomerOrder) MarshalJSON() ([]byte, error) {

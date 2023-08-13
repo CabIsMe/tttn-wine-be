@@ -26,6 +26,7 @@ type CustomerOrderService interface {
 	AllDelivererIdsService() (interface{}, *internal.SystemStatus)
 	GetCustomerOrderToCreateBillService(customerOrderId string) (*models.CustomerOrder, *internal.SystemStatus)
 	GetRevenueDateToDateService(fromDate, toDate string) ([]models.RevenueByDate, *internal.SystemStatus)
+	GetCustomerOrderByCustomerService(customerId string) ([]models.CustomerOrder, *internal.SystemStatus)
 }
 type c_order_service struct {
 	rp repositories.Repos
@@ -265,6 +266,13 @@ func (s *c_order_service) GetCustomerOrderToCreateBillService(customerOrderId st
 }
 func (s *c_order_service) GetRevenueDateToDateService(fromDate, toDate string) ([]models.RevenueByDate, *internal.SystemStatus) {
 	result, err := s.rp.GetRevenueDateToDate(fromDate, toDate)
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return result, nil
+}
+func (s *c_order_service) GetCustomerOrderByCustomerService(customerId string) ([]models.CustomerOrder, *internal.SystemStatus) {
+	result, err := s.rp.GetCustomerOrderByCustomer(customerId)
 	if err != nil {
 		return nil, internal.SysStatus.DbFailed
 	}

@@ -19,6 +19,8 @@ type ProductRepository interface {
 	GetProductsByName(productName string) ([]models.Product, error)
 	GetPromotionalProducts() ([]models.Product, error)
 	GetProductsByTypeAndBrand(productId string) ([]models.Product, error)
+	GetProductsByBrand(brandId string) ([]models.Product, error)
+	GetProductsByCategory(categoryId string) ([]models.Product, error)
 	AddNewProduct(product models.Product) error
 }
 
@@ -125,6 +127,36 @@ func (r *product_repos) GetProductsByTypeAndBrand(productId string) ([]models.Pr
 		Where("(brand_id, category_id) IN (?)", subquery).Find(&products).Error
 	if err != nil {
 		internal.Log.Error("GetProductsByTypeAndBrand", zap.Any("Error", err))
+		return nil, err
+	}
+	return products, nil
+}
+func (r *product_repos) GetProductsByBrand(brandId string) ([]models.Product, error) {
+	var products []models.Product
+	var product models.Product
+
+	err := internal.Db.Debug().Model(&product).
+		Preload("BrandInfo").
+		Preload("CategoryInfo").
+		Preload("PromotionDetailInfo").
+		Where("brand_id = ?", brandId).Find(&products).Error
+	if err != nil {
+		internal.Log.Error("GetProductsByBrand", zap.Any("Error", err))
+		return nil, err
+	}
+	return products, nil
+}
+func (r *product_repos) GetProductsByCategory(categoryId string) ([]models.Product, error) {
+	var products []models.Product
+	var product models.Product
+
+	err := internal.Db.Debug().Model(&product).
+		Preload("BrandInfo").
+		Preload("CategoryInfo").
+		Preload("PromotionDetailInfo").
+		Where("category_id = ?", categoryId).Find(&products).Error
+	if err != nil {
+		internal.Log.Error("GetProductsByCategory", zap.Any("Error", err))
 		return nil, err
 	}
 	return products, nil

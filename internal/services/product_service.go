@@ -14,6 +14,8 @@ type ProductService interface {
 	GetProductsByNameService(productId string) ([]models.Product, *internal.SystemStatus)
 	PromotionalProductsService() ([]models.Product, *internal.SystemStatus)
 	GetProductsByTypeAndBrandService(productId string) ([]models.Product, *internal.SystemStatus)
+	GetProductsByBrandService(productId string) ([]models.Product, *internal.SystemStatus)
+	GetProductsByCategoryService(productId string) ([]models.Product, *internal.SystemStatus)
 	AddNewProductService(product models.Product) *internal.SystemStatus
 }
 type product_service struct {
@@ -75,8 +77,22 @@ func (s *product_service) GetProductsByTypeAndBrandService(productId string) ([]
 	}
 	return listData, nil
 }
+func (s *product_service) GetProductsByBrandService(brandId string) ([]models.Product, *internal.SystemStatus) {
+	listData, err := s.rp.GetProductsByBrand(brandId)
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return listData, nil
+}
+func (s *product_service) GetProductsByCategoryService(categoryId string) ([]models.Product, *internal.SystemStatus) {
+	listData, err := s.rp.GetProductsByCategory(categoryId)
+	if err != nil {
+		return nil, internal.SysStatus.DbFailed
+	}
+	return listData, nil
+}
 func (s *product_service) AddNewProductService(product models.Product) *internal.SystemStatus {
-	
+
 	err := s.rp.AddNewProduct(product)
 	if err != nil {
 		return internal.SysStatus.DbFailed

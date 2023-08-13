@@ -76,10 +76,13 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/client/list-relevant-products", handlers.GetProductsByTypeAndBrandHandler)
 		AppServer.Get("/client/get-promotion-by-date", handlers.GetPromotionByDateHandler)
 		AppServer.Get("/client/list-new-products", handlers.NewReleaseProductsHandler)
+		AppServer.Post("/client/list-products-by-brand", handlers.GetProductsByBrandHandler)
+		AppServer.Post("/client/list-products-by-category", handlers.GetProductsByCategoryHandler)
 		AppServer.Post("/client/get-product", handlers.GetProductHandler)
 		AppServer.Post("/client/get-product-by-name", handlers.GetProductByNameHandler)
-		AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
+		// AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
 		AppServer.Post("/client/customer-login", handlers.UserLoginHandler)
+		AppServer.Post("/client/login-with-google", handlers.SignInWithGoogleHandler)
 		AppServer.Post("/client/create-customer-order", handlers.VerifyTokenClient, handlers.CreateCustomerOrder)
 		AppServer.Post("/client/add-cart", handlers.VerifyTokenClient, handlers.AddProductsToCartHandler)
 		AppServer.Post("/client/remove-cart", handlers.VerifyTokenClient, handlers.RemoveProductsToCartHandler)
@@ -87,6 +90,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Get("/client/customer-info", handlers.VerifyTokenClient, handlers.GetCustomerInfoHandler)
 		AppServer.Post("/client/update-customer", handlers.VerifyTokenClient, handlers.UpdateCustomerHandler)
 		AppServer.Post("/client/payment/success", handlers.VerifyTokenClient, handlers.UpdatePaymentStatusHandler)
+		AppServer.Post("/client/list-ordered", handlers.VerifyTokenClient, handlers.AllCustomerOrdersByCustomerHandler)
 		if err := AppServer.Listen(":" + internal.Envs.ServicePort); err != nil {
 			fmt.Println("Fiber server got error ", err)
 		}

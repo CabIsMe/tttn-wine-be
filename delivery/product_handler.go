@@ -24,6 +24,8 @@ type ProductHandler interface {
 	GetProductByNameHandler(ctx *fiber.Ctx) error
 	PromotionalProductsHandler(ctx *fiber.Ctx) error
 	GetProductsByTypeAndBrandHandler(ctx *fiber.Ctx) error
+	GetProductsByBrandHandler(ctx *fiber.Ctx) error
+	GetProductsByCategoryHandler(ctx *fiber.Ctx) error
 	AddNewProductHandler(ctx *fiber.Ctx) error
 }
 type product_handler struct {
@@ -200,6 +202,82 @@ func (h *product_handler) GetProductsByTypeAndBrandHandler(ctx *fiber.Ctx) error
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 	listData, errGet := h.MainServices.ProductService.GetProductsByTypeAndBrandService(payload.CustomerOrderId)
+	if errGet != nil {
+		ctx.Status(http.StatusOK).JSON(errGet)
+	}
+	output := make(map[string]interface{})
+	output["listData"] = listData
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: output,
+	})
+}
+func (h *product_handler) GetProductsByBrandHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("GetProductsByBrandHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	payload := &struct {
+		BrandId string `json:"brand_id" validate:"required"`
+	}{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
+		resultError.Detail = err.Error()
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	listData, errGet := h.MainServices.ProductService.GetProductsByBrandService(payload.BrandId)
+	if errGet != nil {
+		ctx.Status(http.StatusOK).JSON(errGet)
+	}
+	output := make(map[string]interface{})
+	output["listData"] = listData
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+		Detail: output,
+	})
+}
+func (h *product_handler) GetProductsByCategoryHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("GetProductsByCategoryHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	payload := &struct {
+		CategoryId string `json:"category_id" validate:"required"`
+	}{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
+		resultError.Detail = err.Error()
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	listData, errGet := h.MainServices.ProductService.GetProductsByCategoryService(payload.CategoryId)
 	if errGet != nil {
 		ctx.Status(http.StatusOK).JSON(errGet)
 	}

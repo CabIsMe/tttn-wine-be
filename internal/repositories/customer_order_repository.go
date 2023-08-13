@@ -23,6 +23,7 @@ type CustomerOrderRepository interface {
 	GetCustomerOrderToCreateBill(customerId string) (*models.CustomerOrder, error)
 	UpdateStatusCustomerOrder(id string, status int8) error
 	GetRevenueDateToDate(dateFrom, dateTo string) ([]models.RevenueByDate, error)
+	GetCustomerOrderByCustomer(customerId string) ([]models.CustomerOrder, error)
 }
 
 type c_order_repos struct {
@@ -150,6 +151,16 @@ func (r *c_order_repos) GetAllCustomerOrdersByStatus(listStatus []int8) ([]model
 		Where(fmt.Sprintf("%s.%s IN ?", model.TableName(), model.ColumnStatus()), listStatus).
 		Scan(&customerOrders).Error
 	return customerOrders, err
+}
+
+func (r *c_order_repos) GetCustomerOrderByCustomer(customerId string) ([]models.CustomerOrder, error) {
+	var listData []models.CustomerOrder
+	model := &models.CustomerOrder{}
+	result := internal.Db.Where(fmt.Sprintf("%s = ? ", model.ColumnCustomerId()), customerId).
+		Preload("CustomerOrderDetailInfo").
+		Preload("CustomerOrderDetailInfo.ProductInfo").
+		Find(&listData).Error
+	return listData, result
 }
 func (r *c_order_repos) GetCustomerOrderToCreateBill(customerOrderId string) (*models.CustomerOrder, error) {
 	model := &models.CustomerOrder{}
