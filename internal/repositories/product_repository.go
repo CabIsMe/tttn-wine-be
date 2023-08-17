@@ -22,6 +22,7 @@ type ProductRepository interface {
 	GetProductsByBrand(brandId string) ([]models.Product, error)
 	GetProductsByCategory(categoryId string) ([]models.Product, error)
 	AddNewProduct(product models.Product) error
+	UpdateProduct(product models.Product) error
 }
 
 type product_repos struct {
@@ -38,6 +39,7 @@ func (r *product_repos) GetAllProducts() ([]models.Product, error) {
 		Table(model.TableName()).
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
+		Preload("PromotionDetailInfo").
 		Select("*").
 		Find(&products).Error
 	return products, err
@@ -70,6 +72,7 @@ func (r *product_repos) GetNewReleaseProducts() ([]models.Product, error) {
 	err := internal.Db.Debug().Select("*").Table(model.TableName()).
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
+		Preload("PromotionDetailInfo").
 		Where(fmt.Sprintf("%s = ?", model.ColumnIsNew()), "1").
 		Find(&products)
 	return products, err.Error
@@ -95,6 +98,7 @@ func (r *product_repos) GetProductsByName(productName string) ([]models.Product,
 	result := internal.Db.Where(fmt.Sprintf("%s LIKE ?", model.ColumnProductName()), "%"+productName+"%").
 		Preload("BrandInfo").
 		Preload("CategoryInfo").
+		Preload("PromotionDetailInfo").
 		Find(&listModels).Error
 	return listModels, result
 }
@@ -163,4 +167,25 @@ func (r *product_repos) GetProductsByCategory(categoryId string) ([]models.Produ
 }
 func (r *product_repos) AddNewProduct(product models.Product) error {
 	return internal.Db.Debug().Create(&product).Error
+}
+func (r *product_repos) UpdateProduct(product models.Product) error {
+	err := internal.Db.Debug().Model(models.Product{}).Where(fmt.Sprintf("%s = ?", product.ColumnProductId()), product.ProductId).
+		Updates(models.Product{
+			ProductName:     product.ProductName,
+			Cost:            product.Cost,
+			ProductImg:      product.ProductImg,
+			Description:     product.Description,
+			InventoryNumber: product.InventoryNumber,
+			Status:          product.Status,
+			BrandId:         product.BrandId,
+			CategoryId:      product.CategoryId,
+			IsNew:           product.IsNew,
+		})
+	if err.Error == nil {
+		internal.Log.Info("UpdateProduct", zap.Any("Records", err.RowsAffected))
+		if err.RowsAffected == 0 {
+			return errors.New("Update failed")
+		}
+	}
+	return err.Error
 }

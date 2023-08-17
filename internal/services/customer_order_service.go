@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/CabIsMe/tttn-wine-be/internal"
@@ -38,12 +39,12 @@ func NewCustomerOrderService(rp repositories.Repos) CustomerOrderService {
 	}
 }
 
-func (s *c_order_service) CheckCustomerOrderDetailService(customerOrderDetail models.CustomerOrderDetail) *internal.SystemStatus {
+func (s *c_order_service) CheckCustomerOrderDetailService(productId string, amount int) *internal.SystemStatus {
 	errResult := internal.SystemStatus{
 		Status: internal.CODE_DB_FAILED,
 		Msg:    internal.MSG_DB_FAILED,
 	}
-	product, err := s.rp.GetProduct(customerOrderDetail.ProductId)
+	product, err := s.rp.GetProduct(productId)
 	if err != nil {
 		return &errResult
 	}
@@ -51,7 +52,7 @@ func (s *c_order_service) CheckCustomerOrderDetailService(customerOrderDetail mo
 		errResult.Detail = "Product not found"
 		return &errResult
 	}
-	if product.InventoryNumber < customerOrderDetail.Amount {
+	if product.InventoryNumber < amount {
 		errResult.Detail = "Currently out of stock"
 		return &errResult
 	}
@@ -82,9 +83,10 @@ func (s *c_order_service) CreateCustomerOrderService(
 		if i == flag {
 			continue
 		}
-		s.CheckCustomerOrderDetailService(*customerOrderDetails[i])
+		s.CheckCustomerOrderDetailService(customerOrderDetails[i].ProductId, customerOrderDetails[i].Amount)
 		for j := i + 1; j < len(customerOrderDetails); j++ {
 			if customerOrderDetails[i].ProductId == customerOrderDetails[j].ProductId {
+				// If list products duplicate product.
 				customerOrderDetails[i].Amount += customerOrderDetails[j].Amount
 				customerOrderDetails[i].Cost += customerOrderDetails[j].Cost
 				flag = j
@@ -108,21 +110,26 @@ func (s *c_order_service) CreateCustomerOrderService(
 }
 
 func (s *c_order_service) AddProductsToCartService(cart models.Cart) *internal.SystemStatus {
-
+	errResponse := &internal.SystemStatus{
+		Status: internal.CODE_DB_FAILED,
+		Msg:    internal.MSG_DB_FAILED,
+	}
 	errCreate := s.rp.AddProductsToCart(cart)
 	if errCreate != nil {
 		if strings.Contains(errCreate.Error(), "Duplicate entry") {
-			return &internal.SystemStatus{
-				Status: internal.CODE_DB_FAILED,
-				Msg:    internal.MSG_DB_FAILED,
-				Detail: "The product has been added to cart",
+			model, err := s.rp.GetProductInCart(cart)
+			if err != nil {
+				return errResponse
 			}
+			err = s.rp.UpdateAmountProductInCart(*model)
+			if err != nil {
+				errResponse.Detail = "Update Product in cart failed"
+				return errResponse
+			}
+			return nil
 		}
-		return &internal.SystemStatus{
-			Status: internal.CODE_DB_FAILED,
-			Msg:    internal.MSG_DB_FAILED,
-			Detail: errCreate.Error(),
-		}
+		errResponse.Detail = "Add Product failed"
+		return errResponse
 	}
 	return nil
 }
@@ -197,7 +204,7 @@ func (s *c_order_service) AllProductsInCartService(customerId string) ([]*models
 			errResult.Detail = fmt.Sprintf("%s is no longer available or has sold out.", product.ProductName)
 			return nil, errResult
 		}
-		model.Cost = product.Cost * (1 - promDetail.DiscountPercentage)
+		model.Cost = float32(math.Round(float64(product.Cost * (1 - promDetail.DiscountPercentage))))
 	}
 	return products, nil
 }
@@ -214,15 +221,28 @@ func (s *c_order_service) UpdateCustomerOrderService(customerOrder models.Updati
 }
 
 func (s *c_order_service) UpdatePaymentStatusCustomerOrderService(customerOrderId string) *internal.SystemStatus {
-	err := s.rp.UpdatePaymentStatusCustomerOrder(customerOrderId, 2)
-	if err != nil {
+	errUpdate := s.rp.UpdatePaymentStatusCustomerOrder(customerOrderId, 2)
+	if errUpdate != nil {
 		return internal.SysStatus.DbFailed
 	}
 	return nil
 }
 func (s *c_order_service) UpdateStatusCustomerOrderService(customerOrderId string, stt int8) *internal.SystemStatus {
-	err := s.rp.UpdateStatusCustomerOrder(customerOrderId, stt)
-	if err != nil {
+	//Check exist Invoice
+	if stt == models.Cos.CHECK_OUT_SUCCESS.StatusCode {
+		invoice, err := s.rp.GetBillByCustomerOrderId(customerOrderId)
+		if err != nil {
+			return internal.SysStatus.DbFailed
+		}
+		if invoice == nil {
+			// invoice null -> no update stt
+			errExist := *internal.SysStatus.SystemError
+			errExist.Detail = "Invoice not exist"
+			return &errExist
+		}
+	}
+	errUpdate := s.rp.UpdateStatusCustomerOrder(customerOrderId, stt)
+	if errUpdate != nil {
 		return internal.SysStatus.DbFailed
 	}
 	return nil

@@ -17,6 +17,7 @@ type ProductService interface {
 	GetProductsByBrandService(productId string) ([]models.Product, *internal.SystemStatus)
 	GetProductsByCategoryService(productId string) ([]models.Product, *internal.SystemStatus)
 	AddNewProductService(product models.Product) *internal.SystemStatus
+	UpdateProductService(product models.Product) *internal.SystemStatus
 }
 type product_service struct {
 	rp repositories.Repos
@@ -94,6 +95,14 @@ func (s *product_service) GetProductsByCategoryService(categoryId string) ([]mod
 func (s *product_service) AddNewProductService(product models.Product) *internal.SystemStatus {
 
 	err := s.rp.AddNewProduct(product)
+	if err != nil {
+		return internal.SysStatus.DbFailed
+	}
+	return nil
+}
+func (s *product_service) UpdateProductService(product models.Product) *internal.SystemStatus {
+
+	err := s.rp.UpdateProduct(product)
 	if err != nil {
 		return internal.SysStatus.DbFailed
 	}

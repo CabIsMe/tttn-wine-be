@@ -439,7 +439,7 @@ type Cart struct {
 	ProductId   string  `json:"product_id"`
 	Amount      int     `json:"amount"`
 	Cost        float32 `json:"cost" gorm:"<-:false"`
-	ProductInfo Product `json:"product_info" gorm:"references:ProductId;foreignKey:ProductId"`
+	ProductInfo Product `json:"product_info" gorm:"references:ProductId;foreignKey:ProductId" validate:"omitempty"`
 }
 
 func (Cart) TableName() string {

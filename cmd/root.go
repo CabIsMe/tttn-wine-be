@@ -68,6 +68,7 @@ var rootCmd = &cobra.Command{
 			return ctx.Status(http.StatusOK).JSON(models.Cos)
 		})
 		AppServer.Post("/inside/add-product", handlers.VerifyTokenInside, handlers.AddNewProductHandler)
+		AppServer.Post("/inside/update-product", handlers.VerifyTokenInside, handlers.UpdateProductHandler)
 
 		// Client
 		AppServer.Get("/client/list-products", handlers.AllProductsHandler)
@@ -80,7 +81,7 @@ var rootCmd = &cobra.Command{
 		AppServer.Post("/client/list-products-by-category", handlers.GetProductsByCategoryHandler)
 		AppServer.Post("/client/get-product", handlers.GetProductHandler)
 		AppServer.Post("/client/get-product-by-name", handlers.GetProductByNameHandler)
-		// AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
+		AppServer.Post("/client/sign-up", handlers.SignUpUserHandler)
 		AppServer.Post("/client/customer-login", handlers.UserLoginHandler)
 		AppServer.Post("/client/login-with-google", handlers.SignInWithGoogleHandler)
 		AppServer.Post("/client/create-customer-order", handlers.VerifyTokenClient, handlers.CreateCustomerOrder)

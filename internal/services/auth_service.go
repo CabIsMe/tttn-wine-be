@@ -38,8 +38,20 @@ func (s *auth_service) SignUpUserService(model models.AccountAndFullName) *inter
 		internal.Log.Error("Error in SignUpUserService", zap.Any("model", model))
 		return &errResult
 	}
-	err = s.rp.CreateAccountUser(model)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(model.Password), bcrypt.DefaultCost)
 	if err != nil {
+		errResult.Detail = "error hashedPassword"
+		return &errResult
+	}
+	nanoId, _ := gonanoid.New()
+	errCreate := s.rp.CreateAccountUser(models.AccountAndFullName{
+		Email:    model.Email,
+		Password: string(hashedPassword),
+		Name:     model.Name,
+		UserId:   nanoId,
+		RoleId:   2, // customer role_id
+	})
+	if errCreate != nil {
 		internal.Log.Error("Error in SignUpUserService", zap.Any("model", model))
 		errResult.Detail = "Đã tồn tại " + model.Email
 		return &errResult

@@ -16,6 +16,7 @@ type CustomerOrderRepository interface {
 	UpdateCustomerOrder(customerOrder models.UpdatingCustomerOrder) error
 	UpdatePaymentStatusCustomerOrder(id string, paymentStatus int8) error
 	AddProductsToCart(cart models.Cart) error
+	UpdateAmountProductInCart(cart models.Cart) error
 	RemoveProductsToCart(cart models.Cart) error
 	GetAllProductsInCart(customerId string) ([]*models.Cart, error)
 	GetAllCustomerOrders() ([]models.CustomerOrder, error)
@@ -24,6 +25,7 @@ type CustomerOrderRepository interface {
 	UpdateStatusCustomerOrder(id string, status int8) error
 	GetRevenueDateToDate(dateFrom, dateTo string) ([]models.RevenueByDate, error)
 	GetCustomerOrderByCustomer(customerId string) ([]models.CustomerOrder, error)
+	GetProductInCart(cart models.Cart) (*models.Cart, error)
 }
 
 type c_order_repos struct {
@@ -82,6 +84,29 @@ func (r *c_order_repos) CreateCustomerOrder(customerOrder models.CustomerOrder,
 func (r *c_order_repos) AddProductsToCart(cart models.Cart) error {
 	return internal.Db.Debug().Create(&cart).Error
 }
+func (r *c_order_repos) GetProductInCart(cart models.Cart) (*models.Cart, error) {
+	model := &models.Cart{}
+	err := internal.Db.Debug().Model(&models.Cart{}).Where("product_id = ? AND customer_id = ?", cart.ProductId, cart.CustomerId).
+		Take(model).Error
+	if err != nil {
+		return nil, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return model, nil
+}
+func (r *c_order_repos) UpdateAmountProductInCart(cart models.Cart) error {
+	err := internal.Db.Debug().Model(&models.Cart{}).Where("product_id = ? AND customer_id = ?", cart.ProductId, cart.CustomerId).
+		Update("amount", cart.Amount)
+	if err != nil {
+		return err.Error
+	}
+	if err.RowsAffected == 0 {
+		return errors.New("Update failed")
+	}
+	return nil
+}
 func (r *c_order_repos) RemoveProductsToCart(cart models.Cart) error {
 	return internal.Db.Debug().Where("customer_id = ? AND product_id = ?", cart.CustomerId, cart.ProductId).Delete(&cart).Error
 }
@@ -136,8 +161,14 @@ func (r *c_order_repos) GetAllCustomerOrders() ([]models.CustomerOrder, error) {
 }
 func (r *c_order_repos) UpdateStatusCustomerOrder(id string, status int8) error {
 	model := &models.CustomerOrder{}
-	res := internal.Db.Debug().Model(model).Where(fmt.Sprintf("%s = ?", model.ColumnCustomerOrderId()), id).
-		Update("status", status)
+	res := internal.Db.Debug().Model(model).Where(fmt.Sprintf("%s = ?", model.ColumnCustomerOrderId()), id)
+	if status == 3 {
+		res.Select("status", "payment_status").Updates(models.CustomerOrder{
+			PaymentStatus: 2,
+			Status:        status})
+	} else {
+		res.Update("status", status)
+	}
 	if res.Error != nil {
 		return res.Error
 	}
@@ -159,6 +190,7 @@ func (r *c_order_repos) GetCustomerOrderByCustomer(customerId string) ([]models.
 	result := internal.Db.Where(fmt.Sprintf("%s = ? ", model.ColumnCustomerId()), customerId).
 		Preload("CustomerOrderDetailInfo").
 		Preload("CustomerOrderDetailInfo.ProductInfo").
+		Order("t_create desc").
 		Find(&listData).Error
 	return listData, result
 }

@@ -27,6 +27,7 @@ type ProductHandler interface {
 	GetProductsByBrandHandler(ctx *fiber.Ctx) error
 	GetProductsByCategoryHandler(ctx *fiber.Ctx) error
 	AddNewProductHandler(ctx *fiber.Ctx) error
+	UpdateProductHandler(ctx *fiber.Ctx) error
 }
 type product_handler struct {
 	services.MainServices
@@ -319,6 +320,39 @@ func (h *product_handler) AddNewProductHandler(ctx *fiber.Ctx) error {
 	errCreate := h.MainServices.ProductService.AddNewProductService(*payload)
 	if errCreate != nil {
 		return ctx.Status(http.StatusOK).JSON(errCreate)
+	}
+	return ctx.Status(http.StatusOK).JSON(models.Resp{
+		Status: 1,
+		Msg:    "OK",
+	})
+}
+func (h *product_handler) UpdateProductHandler(ctx *fiber.Ctx) error {
+	resultError := models.Resp{
+		Status: internal.CODE_WRONG_PARAMS,
+		Msg:    internal.MSG_WRONG_PARAMS,
+	}
+	var body interface{}
+	ctx.BodyParser(&body)
+	uri := string(ctx.Request().URI().RequestURI())
+	tokenAuth := string(ctx.Request().Header.Peek("token"))
+	defer func() {
+		internal.Log.Info("UpdateProductHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
+	}()
+	var payload *models.Product
+	if err := ctx.BodyParser(&payload); err != nil {
+		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
+		resultError.Detail = err.Error()
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errs := utils.ValidateStruct(payload)
+	if errs != nil {
+		internal.Log.Error("ValidateStruct", zap.Any("Error", utils.ShowErrors(errs)))
+		resultError.Detail = utils.ShowErrors(errs)
+		return ctx.Status(http.StatusOK).JSON(resultError)
+	}
+	errUpdate := h.MainServices.ProductService.UpdateProductService(*payload)
+	if errUpdate != nil {
+		return ctx.Status(http.StatusOK).JSON(errUpdate)
 	}
 	return ctx.Status(http.StatusOK).JSON(models.Resp{
 		Status: 1,

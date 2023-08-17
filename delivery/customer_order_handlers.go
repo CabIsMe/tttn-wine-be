@@ -192,7 +192,10 @@ func (h *c_order_handler) AddProductsToCartHandler(ctx *fiber.Ctx) error {
 	defer func() {
 		internal.Log.Info("AddProductsToCartHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
 	}()
-	var payload models.Cart
+	payload := &struct {
+		ProductId string `json:"product_id" validate:"required"`
+		Amount    int    `json:"amount" validate:"required"`
+	}{}
 	if err := ctx.BodyParser(&payload); err != nil {
 		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
 		resultError.Detail = err.Error()
@@ -205,8 +208,12 @@ func (h *c_order_handler) AddProductsToCartHandler(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
 	// customer_id from jwt
-	payload.CustomerId = customerId
-	errAdd := h.MainServices.CustomerOrderService.AddProductsToCartService(payload)
+	inputCart := models.Cart{
+		CustomerId: customerId,
+		ProductId:  payload.ProductId,
+		Amount:     payload.Amount,
+	}
+	errAdd := h.MainServices.CustomerOrderService.AddProductsToCartService(inputCart)
 	if errAdd != nil {
 		return ctx.Status(http.StatusOK).JSON(errAdd)
 	}
@@ -231,7 +238,9 @@ func (h *c_order_handler) RemoveProductsToCartHandler(ctx *fiber.Ctx) error {
 	defer func() {
 		internal.Log.Info("RemoveProductsToCartHandler", zap.Any("uri", uri), zap.Any("auth", tokenAuth), zap.Any("body", body))
 	}()
-	var payload models.Cart
+	payload := &struct {
+		ProductId string `json:"product_id" validate:"required"`
+	}{}
 	if err := ctx.BodyParser(&payload); err != nil {
 		internal.Log.Error("BodyParser", zap.Any("Error", err.Error()))
 		resultError.Detail = err.Error()
@@ -243,8 +252,11 @@ func (h *c_order_handler) RemoveProductsToCartHandler(ctx *fiber.Ctx) error {
 		resultError.Detail = utils.ShowErrors(errs)
 		return ctx.Status(http.StatusOK).JSON(resultError)
 	}
-	payload.CustomerId = customerId
-	errAdd := h.MainServices.CustomerOrderService.RemoveProductsToCartService(payload)
+	inputCart := models.Cart{
+		CustomerId: customerId,
+		ProductId:  payload.ProductId,
+	}
+	errAdd := h.MainServices.CustomerOrderService.RemoveProductsToCartService(inputCart)
 	if errAdd != nil {
 		return ctx.Status(http.StatusOK).JSON(errAdd)
 	}
